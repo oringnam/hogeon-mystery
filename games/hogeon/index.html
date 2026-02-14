@@ -507,7 +507,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.10 (2026-02-14 16:56 KST) - Family Story Fixed</div>
+            <div class="version-info">v3.11 (2026-02-14 16:58 KST) - Share Fix (Direct Copy)</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -831,28 +831,10 @@ ${endingData.emoji} ${endingData.title}
 
 https://oringnam.github.io/hogeon-mystery/`;
 
-            // Try Web Share API first (mobile native share)
-            if (navigator.share) {
-                console.log('Using Web Share API'); // DEBUG
-                navigator.share({
-                    title: '호건이를 찾아서',
-                    text: shareText
-                }).then(() => {
-                    console.log('Share successful'); // DEBUG
-                    showNotification('✅ 공유 완료!');
-                }).catch((err) => {
-                    console.log('Share failed:', err); // DEBUG
-                    // If user cancelled, don't show error
-                    if (err.name !== 'AbortError') {
-                        copyEndingText(); // Fallback to copy
-                    }
-                });
-                return;
-            }
+            console.log('Share text prepared:', shareText); // DEBUG
             
-            // Fallback to clipboard copy
-            console.log('Web Share not supported, using clipboard'); // DEBUG
-            copyEndingText();
+            // Direct clipboard copy (most reliable for KakaoTalk sharing)
+            copyTextToClipboard(shareText);
         }
         
         function showNotification(message) {
@@ -866,87 +848,75 @@ https://oringnam.github.io/hogeon-mystery/`;
             }
         }
 
-        function copyEndingText() {
-            console.log('copyEndingText called'); // DEBUG
+        function copyTextToClipboard(text) {
+            console.log('copyTextToClipboard called with text:', text); // DEBUG
             
-            const endingData = endings[currentEnding] || endings.ship;
-            const collectedEndings = getCollectedEndings().length;
+            // Method 1: Modern Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                console.log('Trying Clipboard API'); // DEBUG
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        console.log('Clipboard API SUCCESS'); // DEBUG
+                        showNotification('✅ 복사 완료! 카톡에 붙여넣기 하세요');
+                    })
+                    .catch((err) => {
+                        console.log('Clipboard API failed:', err); // DEBUG
+                        // Fallback to textarea method
+                        copyViaTextarea(text);
+                    });
+                return;
+            }
             
-            const shareText = `🔍 호건이를 찾아서
-
-${endingData.emoji} ${endingData.title}
-
-나는 ${collectedEndings}/9개 엔딩을 수집했어!
-너도 호건이를 찾아봐!
-
-https://oringnam.github.io/hogeon-mystery/`;
-
-            console.log('Share text:', shareText); // DEBUG
-
-            // Clipboard API fallback for mobile
-            const copyToClipboard = (text) => {
-                console.log('Attempting clipboard copy...'); // DEBUG
-                
-                // Try modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    console.log('Using Clipboard API'); // DEBUG
-                    return navigator.clipboard.writeText(text)
-                        .then(() => {
-                            console.log('Clipboard API success'); // DEBUG
-                            return true;
-                        })
-                        .catch((err) => {
-                            console.log('Clipboard API failed:', err); // DEBUG
-                            return false;
-                        });
-                }
-                
-                console.log('Using fallback method'); // DEBUG
-                
-                // Fallback: create textarea and copy
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.top = '0';
-                textarea.style.left = '0';
-                textarea.style.width = '2em';
-                textarea.style.height = '2em';
-                textarea.style.padding = '0';
-                textarea.style.border = 'none';
-                textarea.style.outline = 'none';
-                textarea.style.boxShadow = 'none';
-                textarea.style.background = 'transparent';
-                document.body.appendChild(textarea);
-                
-                try {
-                    textarea.focus();
-                    textarea.select();
-                    textarea.setSelectionRange(0, textarea.value.length); // For mobile
-                    const success = document.execCommand('copy');
-                    console.log('execCommand copy result:', success); // DEBUG
-                    document.body.removeChild(textarea);
-                    return Promise.resolve(success);
-                } catch (err) {
-                    console.log('Fallback copy failed:', err); // DEBUG
-                    document.body.removeChild(textarea);
-                    return Promise.resolve(false);
-                }
-            };
-
-            copyToClipboard(shareText).then(success => {
-                console.log('Copy result:', success); // DEBUG
+            // Method 2: Fallback - textarea + execCommand
+            console.log('Clipboard API not available, using textarea'); // DEBUG
+            copyViaTextarea(text);
+        }
+        
+        function copyViaTextarea(text) {
+            console.log('copyViaTextarea called'); // DEBUG
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            
+            // Make it visible but off-screen for mobile
+            textarea.style.position = 'fixed';
+            textarea.style.top = '0';
+            textarea.style.left = '0';
+            textarea.style.width = '100%';
+            textarea.style.height = '100px';
+            textarea.style.fontSize = '16px'; // Prevent zoom on iOS
+            textarea.setAttribute('readonly', '');
+            
+            document.body.appendChild(textarea);
+            
+            // Focus and select
+            textarea.focus();
+            textarea.select();
+            
+            // For iOS
+            textarea.setSelectionRange(0, 99999);
+            
+            try {
+                const success = document.execCommand('copy');
+                console.log('execCommand result:', success); // DEBUG
                 
                 if (success) {
-                    showNotification('✅ 공유 텍스트가 복사되었습니다!');
+                    showNotification('✅ 복사 완료! 카톡에 붙여넣기 하세요');
                 } else {
-                    // Last resort: show text in modal
-                    showShareTextModal(shareText);
+                    // Last resort: show manual copy modal
+                    showShareTextModal(text);
                 }
-            });
+            } catch (err) {
+                console.log('execCommand error:', err); // DEBUG
+                showShareTextModal(text);
+            } finally {
+                document.body.removeChild(textarea);
+            }
         }
         
         function showShareTextModal(text) {
-            console.log('Showing text modal as last resort'); // DEBUG
+            console.log('Showing manual copy modal'); // DEBUG
+            
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed;
@@ -954,7 +924,7 @@ https://oringnam.github.io/hogeon-mystery/`;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0,0,0,0.8);
+                background: rgba(0,0,0,0.9);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -965,25 +935,79 @@ https://oringnam.github.io/hogeon-mystery/`;
             const content = document.createElement('div');
             content.style.cssText = `
                 background: white;
-                padding: 20px;
-                border-radius: 10px;
+                padding: 24px;
+                border-radius: 12px;
                 max-width: 500px;
                 width: 100%;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             `;
             
             content.innerHTML = `
-                <h3 style="margin-top: 0;">📤 공유 텍스트</h3>
-                <p style="font-size: 12px; color: #666;">아래 텍스트를 길게 눌러서 복사하세요:</p>
-                <textarea readonly style="width: 100%; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">${text}</textarea>
-                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; width: 100%;">닫기</button>
+                <h3 style="margin: 0 0 12px 0; color: #333;">📤 공유하기</h3>
+                <p style="margin: 0 0 16px 0; font-size: 14px; color: #666;">
+                    아래 텍스트를 <strong>길게 눌러서</strong> 전체 선택 후 복사하세요:
+                </p>
+                <textarea 
+                    readonly 
+                    id="shareTextArea"
+                    style="
+                        width: 100%; 
+                        height: 180px; 
+                        padding: 12px; 
+                        border: 2px solid #667eea; 
+                        border-radius: 8px; 
+                        font-size: 14px;
+                        line-height: 1.5;
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        resize: none;
+                        box-sizing: border-box;
+                    "
+                >${text}</textarea>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <button 
+                        onclick="document.getElementById('shareTextArea').select(); document.execCommand('copy'); this.textContent='✅ 복사됨!'"
+                        style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #667eea;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        "
+                    >
+                        📋 복사하기
+                    </button>
+                    <button 
+                        onclick="this.closest('div').parentElement.parentElement.remove()"
+                        style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #e0e0e0;
+                            color: #333;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        "
+                    >
+                        닫기
+                    </button>
+                </div>
             `;
             
             modal.appendChild(content);
             document.body.appendChild(modal);
             
-            // Auto-select text
-            const textarea = content.querySelector('textarea');
-            textarea.select();
+            // Auto-focus and select
+            setTimeout(() => {
+                const textarea = document.getElementById('shareTextArea');
+                textarea.focus();
+                textarea.select();
+            }, 100);
         }
 
         function selectChoice(index, choiceText) {
