@@ -7,6 +7,7 @@
 -> ending_religion
 
 === ending_religion ===
+# MUSIC: ending-sad
 # ENDING: religion
 # IMAGE: ending_religion.png
 # 엔딩 7: 깨달음의 길

@@ -6,6 +6,7 @@
 -> ending_fantasy
 
 === ending_fantasy ===
+# MUSIC: ending-happy
 # ENDING: fantasy
 # IMAGE: ending_isekai.png
 # 엔딩 5: 이세계 전이 전설

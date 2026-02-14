@@ -19,6 +19,7 @@
 -> ending_coma
 
 === ending_coma ===
+# MUSIC: ending-sad
 # ENDING: coma
 # IMAGE: ending_hospital.png
 # 엔딩 3: 잠든 친구

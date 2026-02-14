@@ -5,6 +5,7 @@
 -> ending_business
 
 === ending_business ===
+# MUSIC: ending-sad
 # ENDING: business
 # IMAGE: ending_business.png
 # 엔딩 8: 재기의 섬

@@ -51,6 +51,7 @@
 -> ending_ship
 
 === ending_ship ===
+# MUSIC: ending-happy
 # ENDING: ship
 # IMAGE: ending_ship.png
 # 엔딩 2: 바다의 남자

@@ -7,6 +7,7 @@
 -> ending_spy
 
 === ending_spy ===
+# MUSIC: ending-sad
 # ENDING: spy
 # IMAGE: ending_spy.png
 # 엔딩 6: 그림자 요원

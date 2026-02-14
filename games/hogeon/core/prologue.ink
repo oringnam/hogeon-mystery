@@ -4,6 +4,7 @@
 
 === prologue ===
 # IMAGE: prologue.png
+# MUSIC: intro
 # 프롤로그: 9년 만의 연락
 
 2026년 2월, 서울 강남의 한 카페.

@@ -4,6 +4,7 @@
 -> ending_prison
 
 === ending_prison ===
+# MUSIC: ending-sad
 # ENDING: prison
 # IMAGE: ending_prison.png
 # 엔딩 9: 속죄와 용서

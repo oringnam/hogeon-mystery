@@ -8,6 +8,7 @@
 -> ending_witness
 
 === ending_witness ===
+# MUSIC: ending-sad
 # ENDING: witness
 # IMAGE: ending_witness.png
 # 엔딩 4: 증인의 귀환

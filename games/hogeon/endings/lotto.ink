@@ -44,6 +44,7 @@
 
 === ending_lotto ===
 # ENDING: lotto
+# MUSIC: ending-happy
 # IMAGE: ending_lotto.png
 # 엔딩 1: 로또 당첨의 고독
 

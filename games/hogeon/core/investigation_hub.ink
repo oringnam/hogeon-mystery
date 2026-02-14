@@ -3,6 +3,7 @@
 // ========================================
 
 === investigation_hub ===
+# MUSIC: investigation
 
 // 단서 개수 세기
 ~ temp clue_count = 0
