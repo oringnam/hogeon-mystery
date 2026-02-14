@@ -288,16 +288,45 @@
         </div>
 
         <footer>
-            <div class="version" onclick="showChangelog()">
-                v3.33 · 2026-02-14
+            <div class="version" id="versionBadge" onclick="showChangelog()">
+                버전 불러오는 중...
             </div>
         </footer>
     </div>
 
     <script>
+        function parseLatestVersionFromChangelog(markdown) {
+            // 예: "## v4.8 (2026-02-15) - ..."
+            const m = markdown.match(/^##\s+v([0-9.]+)\s*\((\d{4}-\d{2}-\d{2})\)/m);
+            if (!m) return null;
+            return { version: `v${m[1]}`, date: m[2] };
+        }
+
+        async function updateVersionBadge() {
+            const badge = document.getElementById('versionBadge');
+            if (!badge) return;
+
+            try {
+                const res = await fetch(`CHANGELOG.md?ts=${Date.now()}`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const md = await res.text();
+
+                const latest = parseLatestVersionFromChangelog(md);
+                if (!latest) throw new Error('parse failed');
+
+                badge.textContent = `${latest.version} · ${latest.date}`;
+            } catch (e) {
+                // 실패 시에는 너무 거슬리지 않게 기본 텍스트
+                badge.textContent = '변경 이력 보기';
+                console.log('version badge update failed:', e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateVersionBadge);
+
         // 변경 이력 모달 표시
         function showChangelog() {
-            fetch('CHANGELOG.md')
+            fetch(`CHANGELOG.md?ts=${Date.now()}`, { cache: 'no-store' })
                 .then(response => response.text())
                 .then(markdown => {
                     // 간단한 마크다운 → HTML 변환
