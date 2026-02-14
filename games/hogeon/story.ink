@@ -124,10 +124,43 @@ VAR checked_records = false
 
 === investigation_hub ===
 
-{ investigation_depth >= 5:
-    친구들이 지친 표정으로 모였다.
+// 단서 개수 세기
+~ temp clue_count = 0
+{ clue_lotto:
+    ~ clue_count = clue_count + 1
+}
+{ clue_ship:
+    ~ clue_count = clue_count + 1
+}
+{ clue_witness:
+    ~ clue_count = clue_count + 1
+}
+{ clue_hospital:
+    ~ clue_count = clue_count + 1
+}
+{ clue_fantasy:
+    ~ clue_count = clue_count + 1
+}
+{ clue_spy:
+    ~ clue_count = clue_count + 1
+}
+{ clue_religion:
+    ~ clue_count = clue_count + 1
+}
+{ clue_business:
+    ~ clue_count = clue_count + 1
+}
+{ clue_prison:
+    ~ clue_count = clue_count + 1
+}
+
+// 단서가 충분히 모이면 자동으로 추론 시작
+{ clue_count >= 3 or investigation_depth >= 5:
+    친구들이 모인 단서를 보며 고개를 끄덕였다.
     
-    "이제 충분히 조사한 것 같아. 정리해보자."
+    "이제 충분히 알아낸 것 같은데?"
+    
+    범환이 화이트보드를 보며 말했다. "정리해보자."
     
     -> analysis_phase
 }
@@ -138,12 +171,6 @@ VAR checked_records = false
 }
 { investigation_depth == 2:
     "단서가 쌓이고 있어. 계속 파보자."
-}
-{ investigation_depth == 3:
-    "점점 윤곽이 잡히는 것 같은데... 더 조사해야 할 것 같아."
-}
-{ investigation_depth >= 4:
-    "많이 알아냈네. 조금만 더 파보자."
 }
 
 친구들이 다시 모여 다음 행동을 논의했다.
@@ -161,9 +188,6 @@ VAR checked_records = false
 
 * {not checked_records} [공공 기록 검색하기]
     -> check_public_records
-
-+ {investigation_depth >= 2} [모은 단서 분석하고 결론 내리기]
-    -> analysis_phase
 
 // ========================================
 // SNS 계정 조사
@@ -517,106 +541,8 @@ VAR checked_records = false
     ~ clue_count = clue_count + 1
 }
 
-// 단서가 1-2개면 자동 추론
-{ clue_count <= 2:
-    -> auto_deduction
-}
-
-// 단서가 3개 이상: 친구들이 토론하며 좁히기
-친구들이 수집한 단서를 종합했다.
-
-"이 단서들을 보면..."
-
-범환이 화이트보드를 보며 말했다. "여러 가능성이 있는데, 가장 가능성 높은 건..."
-
-+ {clue_lotto} ["로또 당첨 기록과 어머니 수술... 이게 답인 것 같아"]
-    진원이 단서들을 다시 펼쳤다.
-    
-    "로또 당첨 시기, 어머니 수술비, SNS 포스팅..."
-    
-    "모든 게 맞아떨어져."
-    
-    -> approach_lotto_ending
-
-+ {clue_ship} ["부산 선박회사 기록... 바다로 간 거야"]
-    정호가 송금 기록을 가리켰다.
-    
-    "생활비 출처가 부산 선박회사였잖아."
-    
-    "원양어선이야."
-    
-    -> approach_ship_ending
-
-+ {clue_witness} ["증인보호 프로그램... 숨어 있는 거야"]
-    형준이 법원 기록을 보여줬다.
-    
-    "증인 출석 이후 잠적..."
-    
-    "경찰에 다시 문의해보자."
-    
-    -> approach_witness_ending
-
-+ {clue_hospital} ["교통사고 기록... 혹시 지금도..."]
-    범환이 침통한 표정으로 말했다.
-    
-    "2017년 사고 이후... 병원 기록이 계속 있어."
-    
-    "가봐야 할 것 같아."
-    
-    -> approach_coma_ending
-
-+ {clue_fantasy} ["원룸의 이상한 흔적... 뭔가 있어"]
-    현식이 사진을 다시 펼쳤다.
-    
-    "이건 정상적인 이사가 아니야."
-    
-    "다시 가보자."
-    
-    -> approach_fantasy_ending
-
-+ {clue_spy} ["국정원 채용 시기... 정보보안 수강..."]
-    현이 데이터를 정리했다.
-    
-    "모든 패턴이 국가기관 채용이랑 일치해."
-    
-    "기다려보자."
-    
-    -> approach_spy_ending
-
-+ {clue_religion} ["출가 기록... 절로 간 거야"]
-    효배가 스님과의 대화를 떠올렸다.
-    
-    "2017년 출가..."
-    
-    "강원도 산사로 가보자."
-    
-    -> approach_religion_ending
-
-+ {clue_business} ["사업 실패... 빚 때문에 숨은 거야"]
-    진원이 신용 기록을 확인했다.
-    
-    "1억 가까운 빚..."
-    
-    "어딘가 숨어 있을 거야."
-    
-    -> approach_business_ending
-
-+ {clue_prison} ["법원 기록... 복역 중인 거야"]
-    범환이 교정시설 명단을 확인했다.
-    
-    "이름이 있어..."
-    
-    "면회 가자."
-    
-    -> approach_prison_ending
-
-+ {investigation_depth >= 2} ["더 조사가 필요해"]
-    "아직 확실하지 않아. 더 파보자."
-    -> deeper_investigation
-
-+ {investigation_depth < 2} ["단서가 부족해. 더 조사하자"]
-    "이 정도론 부족해. 제대로 파보자."
-    -> investigation_hub
+// 모든 경우 자동 추론 (선택지 완전 제거)
+-> auto_deduction
 
 // ========================================
 // 자동 추론 (단서 1-2개)
