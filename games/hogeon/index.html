@@ -37,6 +37,7 @@
             padding: 20px;
             text-align: center;
             flex-shrink: 0;
+            position: relative;
         }
 
         .game-header h1 {
@@ -47,6 +48,123 @@
         .game-header p {
             opacity: 0.9;
             font-size: 0.85em;
+        }
+
+        .header-buttons {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        .progress-bar {
+            margin-top: 10px;
+            font-size: 0.8em;
+            opacity: 0.85;
+        }
+
+        .progress-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            margin-top: 5px;
+        }
+
+        /* 단서 노트 모달 */
+        .clue-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            animation: fadeIn 0.3s;
+        }
+
+        .clue-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .clue-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .clue-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clue-header h2 {
+            font-size: 1.3em;
+        }
+
+        .close-clue {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .clue-body {
+            padding: 20px;
+        }
+
+        .clue-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+
+        .clue-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .no-clues {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
         }
 
         /* 대화창 + 선택지 영역 */
@@ -354,8 +472,16 @@
 <body>
     <div class="game-container">
         <div class="game-header">
+            <div class="header-buttons">
+                <button class="header-btn" onclick="showClues()">📋 단서</button>
+            </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
+            <div class="progress-bar">
+                <div class="progress-indicator" id="progressIndicator">
+                    조사 시작 전
+                </div>
+            </div>
         </div>
 
         <div class="game-body">
@@ -395,6 +521,19 @@
         ✅ 클립보드에 복사되었습니다!
     </div>
 
+    <!-- 단서 노트 모달 -->
+    <div class="clue-modal" id="clueModal">
+        <div class="clue-content">
+            <div class="clue-header">
+                <h2>🔍 수집한 단서</h2>
+                <button class="close-clue" onclick="hideClues()">×</button>
+            </div>
+            <div class="clue-body" id="clueList">
+                <div class="no-clues">아직 수집한 단서가 없습니다.</div>
+            </div>
+        </div>
+    </div>
+
     <!-- inkjs 라이브러리 로드 (버전 2.3.0) -->
     <script src="https://unpkg.com/inkjs@2.3.0/dist/ink.js"></script>
 
@@ -403,6 +542,19 @@
         let currentEnding = null;
         const storyContainer = document.getElementById('story');
         const choicesContainer = document.getElementById('choices');
+
+        // 단서 정보 맵
+        const clueInfo = {
+            'clue_lotto': { name: '로또 당첨', desc: '동대문구에서 1등 당첨 기록 발견' },
+            'clue_ship': { name: '원양어선', desc: '부산 선박회사 근무 중' },
+            'clue_prison': { name: '복역 중', desc: '교통사고 치사로 수감' },
+            'clue_hospital': { name: '교통사고', desc: '2017년 사고 후 의식불명' },
+            'clue_fantasy': { name: '이세계', desc: '원룸에서 미스터리한 흔적' },
+            'clue_spy': { name: '국정원', desc: '체력 단련, 정보보안 수강' },
+            'clue_religion': { name: '출가', desc: '강원도 산사에서 수행 중' },
+            'clue_business': { name: '사업 실패', desc: '1억 가까운 빚' },
+            'clue_witness': { name: '증인보호', desc: '폭력 사건 목격 후 보호 중' }
+        };
 
         // 엔딩 정보 맵
         const endings = {
@@ -428,6 +580,7 @@
             .then(storyData => {
                 story = new inkjs.Story(storyData);
                 storyContainer.innerHTML = ''; // 로딩 메시지 제거
+                updateProgress(); // 초기 진행도 업데이트
                 continueStory();
             })
             .catch(error => {
@@ -521,6 +674,9 @@
                 choicesContainer.style.display = 'none';
                 showEndingModal();
             }
+
+            // 진행도 업데이트
+            updateProgress();
         }
 
         function renderImage(filename) {
@@ -581,9 +737,29 @@
             const modal = document.getElementById('endingModal');
             const endingData = endings[currentEnding] || endings.ship; // fallback
             
+            // 엔딩 수집 (로컬스토리지)
+            const collectedEndings = JSON.parse(localStorage.getItem('hogeon_endings') || '[]');
+            if (currentEnding && !collectedEndings.includes(currentEnding)) {
+                collectedEndings.push(currentEnding);
+                localStorage.setItem('hogeon_endings', JSON.stringify(collectedEndings));
+            }
+            
+            const endingCount = collectedEndings.length;
+            const isNewEnding = currentEnding && collectedEndings[collectedEndings.length - 1] === currentEnding;
+            
             document.getElementById('endingImage').textContent = endingData.emoji;
             document.getElementById('endingTitle').textContent = endingData.title;
-            document.getElementById('endingDescription').textContent = endingData.desc;
+            
+            let description = endingData.desc;
+            if (isNewEnding && endingCount > 1) {
+                description += `\n\n✨ 새로운 엔딩 발견! (${endingCount}/9)`;
+            } else if (endingCount === 9) {
+                description += '\n\n🎉 모든 엔딩을 수집했습니다!';
+            } else {
+                description += `\n\n수집한 엔딩: ${endingCount}/9`;
+            }
+            
+            document.getElementById('endingDescription').textContent = description;
             
             modal.classList.add('show');
         }
@@ -628,6 +804,59 @@ ${endingData.desc}
 
         function scrollToBottom() {
             storyContainer.scrollTop = storyContainer.scrollHeight;
+        }
+
+        // 진행도 업데이트
+        function updateProgress() {
+            if (!story) return;
+
+            const vars = story.variablesState;
+            const investigationDepth = vars.$('investigation_depth') || 0;
+            
+            // 수집한 단서 개수 세기
+            const clueCount = Object.keys(clueInfo).filter(clueKey => 
+                vars.$(clueKey) === true
+            ).length;
+
+            const progressEl = document.getElementById('progressIndicator');
+            if (investigationDepth === 0) {
+                progressEl.textContent = '조사 시작 전';
+            } else {
+                progressEl.textContent = `📊 조사 ${investigationDepth}단계 | 🔍 단서 ${clueCount}/9개`;
+            }
+        }
+
+        // 단서 노트 표시
+        function showClues() {
+            if (!story) return;
+
+            const vars = story.variablesState;
+            const clueList = document.getElementById('clueList');
+            const collectedClues = [];
+
+            Object.keys(clueInfo).forEach(clueKey => {
+                if (vars.$(clueKey) === true) {
+                    collectedClues.push(clueInfo[clueKey]);
+                }
+            });
+
+            if (collectedClues.length === 0) {
+                clueList.innerHTML = '<div class="no-clues">아직 수집한 단서가 없습니다.</div>';
+            } else {
+                clueList.innerHTML = collectedClues.map(clue => `
+                    <div class="clue-item">
+                        <strong>${clue.name}</strong>
+                        <div>${clue.desc}</div>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('clueModal').classList.add('show');
+        }
+
+        // 단서 노트 숨기기
+        function hideClues() {
+            document.getElementById('clueModal').classList.remove('show');
         }
 
         // Service Worker 등록 (캐싱으로 빠른 재방문)
