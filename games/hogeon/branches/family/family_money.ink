@@ -19,8 +19,6 @@
 }
 
 ~ clue_lotto = true
-~ clue_ship = true
-~ clue_business = true
 ~ family_path = family_money
 
 * [대출 독촉 시기와 SNS 포스팅 비교하기]
