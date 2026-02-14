@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>호건이를 찾아서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .game-container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .game-header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .game-header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .story-container {
+            padding: 30px;
+            max-height: 60vh;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .story-text {
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s;
+        }
+
+        .story-text h1 {
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .story-text p {
+            margin-bottom: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .choices {
+            padding: 20px 30px 30px 30px;
+            background: #f8f9fa;
+        }
+
+        .choice-button {
+            display: block;
+            width: 100%;
+            padding: 18px 24px;
+            margin-bottom: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-family: inherit;
+            color: #333;
+        }
+
+        .choice-button:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .choice-button:active {
+            transform: translateY(0);
+        }
+
+        .choice-button::before {
+            content: '▸ ';
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .game-end {
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .game-end h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .restart-button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 30px;
+            color: #666;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 600px) {
+            .game-header h1 {
+                font-size: 1.6em;
+            }
+
+            .story-container {
+                padding: 20px;
+                font-size: 0.95em;
+            }
+
+            .choices {
+                padding: 15px 20px 20px 20px;
+            }
+
+            .choice-button {
+                padding: 15px 20px;
+                font-size: 0.95em;
+            }
+        }
+
+        /* 스크롤바 스타일링 */
+        .story-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .story-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .story-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .story-container::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🔍 호건이를 찾아서</h1>
+            <p>9년 만의 미스터리를 풀어보세요</p>
+        </div>
+
+        <div class="story-container" id="story">
+            <div class="loading">스토리를 불러오는 중</div>
+        </div>
+
+        <div class="choices" id="choices" style="display: none;"></div>
+    </div>
+
+    <!-- inkjs 라이브러리 로드 (버전 2.3.0) -->
+    <script src="https://unpkg.com/inkjs@2.3.0/dist/ink.js"></script>
+
+    <script>
+        let story;
+        const storyContainer = document.getElementById('story');
+        const choicesContainer = document.getElementById('choices');
+
+        // 스토리 로드
+        fetch('story.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('story.json을 찾을 수 없습니다. 먼저 컴파일 해주세요.');
+                }
+                return response.json();
+            })
+            .then(storyData => {
+                story = new inkjs.Story(storyData);
+                continueStory();
+            })
+            .catch(error => {
+                storyContainer.innerHTML = `
+                    <div style="color: red; padding: 40px; text-align: center;">
+                        <h2>⚠️ 오류 발생</h2>
+                        <p>${error.message}</p>
+                        <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
+                            story.ink 파일을 컴파일하셨나요?<br>
+                            <code>inklecate -o story.json story.ink</code>
+                        </p>
+                    </div>
+                `;
+            });
+
+        function continueStory() {
+            storyContainer.innerHTML = '';
+
+            // 스토리 텍스트 출력
+            while (story.canContinue) {
+                const line = story.Continue();
+                
+                if (line.trim() !== '') {
+                    const p = document.createElement('div');
+                    p.className = 'story-text';
+                    
+                    // 마크다운 스타일 헤더 변환 (# 헤더)
+                    if (line.trim().startsWith('# ')) {
+                        const h1 = document.createElement('h1');
+                        h1.textContent = line.replace('# ', '').trim();
+                        p.appendChild(h1);
+                    } else {
+                        // 볼드 처리 (**text**)
+                        let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        p.innerHTML = formattedLine;
+                    }
+                    
+                    storyContainer.appendChild(p);
+                }
+            }
+
+            // 선택지 출력
+            const choices = story.currentChoices;
+            
+            if (choices.length > 0) {
+                choicesContainer.style.display = 'block';
+                choicesContainer.innerHTML = '';
+                
+                choices.forEach((choice, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-button';
+                    button.textContent = choice.text;
+                    button.onclick = () => selectChoice(index);
+                    choicesContainer.appendChild(button);
+                });
+            } else {
+                // 스토리 끝
+                choicesContainer.style.display = 'block';
+                choicesContainer.innerHTML = `
+                    <div class="game-end">
+                        <h2>🎭 이야기가 끝났습니다</h2>
+                        <button class="restart-button" onclick="location.reload()">
+                            🔄 다시 시작하기
+                        </button>
+                    </div>
+                `;
+            }
+
+            // 최신 텍스트로 스크롤
+            storyContainer.scrollTop = storyContainer.scrollHeight;
+        }
+
+        function selectChoice(index) {
+            story.ChooseChoiceIndex(index);
+            continueStory();
+        }
+    </script>
+</body>
+</html>

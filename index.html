@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>호건이를 찾아서 - Interactive Mystery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: fadeInUp 1s;
+        }
+
+        .game-card h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .game-card .description {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .game-card .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .game-card .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .game-card .features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .game-card .features li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #555;
+        }
+
+        .game-card .features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .play-button {
+            display: inline-block;
+            padding: 18px 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .play-button:active {
+            transform: translateY(-1px);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .game-card {
+                padding: 30px 20px;
+            }
+
+            .game-card h2 {
+                font-size: 1.5em;
+            }
+
+            .play-button {
+                font-size: 1.1em;
+                padding: 15px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 호건이를 찾아서</h1>
+            <p>9년 만의 미스터리 인터랙티브 스토리</p>
+        </header>
+
+        <div class="game-card">
+            <h2>Where is Hogeon?</h2>
+            
+            <div class="description">
+                2017년부터 연락이 끊긴 친구 호건.<br>
+                9명의 친구들이 그를 찾아 나섭니다.<br>
+                <strong>당신의 선택이 진실을 결정합니다.</strong>
+            </div>
+
+            <div class="features">
+                <h3>게임 특징</h3>
+                <ul>
+                    <li>9가지 다른 엔딩</li>
+                    <li>단서 수집 기반 추리</li>
+                    <li>약 30분 플레이 타임</li>
+                    <li>모바일 최적화</li>
+                    <li>실화 기반 캐릭터</li>
+                </ul>
+            </div>
+
+            <div class="features">
+                <h3>가능한 결말</h3>
+                <ul>
+                    <li>🎰 로또 당첨</li>
+                    <li>🚢 원양어선</li>
+                    <li>🏥 코마 상태</li>
+                    <li>👁️ 국정원 요원</li>
+                    <li>🙏 종교 입문</li>
+                    <li>💼 사업 실패</li>
+                    <li>🛡️ 증인보호</li>
+                    <li>⚖️ 감옥</li>
+                    <li>✨ 그리고 하나 더...</li>
+                </ul>
+            </div>
+
+            <a href="games/hogeon/" class="play-button">
+                ▶ 게임 시작하기
+            </a>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ using Ink & inkjs</p>
+            <p style="margin-top: 10px;">© 2026 Interactive Story Project</p>
+        </footer>
+    </div>
+
+    <script>
+        // 페이지 로드 시 애니메이션
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎮 호건이를 찾아서 - Ready to play!');
+        });
+    </script>
+</body>
+</html>

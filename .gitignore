@@ -1,0 +1,22 @@
+# Compiled JSON (컴파일된 파일, 재생성 가능)
+games/*/story.json
+
+# Compiler binary (플랫폼별로 다름)
+tools/inklecate
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+*.temp
