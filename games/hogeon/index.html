@@ -163,32 +163,128 @@
             font-weight: bold;
         }
 
-        .game-end {
-            text-align: center;
-            padding: 30px 20px;
+        /* 엔딩 모달 */
+        .ending-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            animation: fadeIn 0.3s;
         }
 
-        .game-end h2 {
+        .ending-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .ending-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ending-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            color: white;
+        }
+
+        .ending-body {
+            padding: 30px;
+        }
+
+        .ending-title {
+            font-size: 1.8em;
+            font-weight: bold;
             color: #667eea;
             margin-bottom: 15px;
-            font-size: 1.5em;
+            text-align: center;
         }
 
-        .restart-button {
-            padding: 12px 35px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .ending-description {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 1.05em;
+        }
+
+        .ending-actions {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 15px 25px;
             border: none;
-            border-radius: 20px;
+            border-radius: 12px;
             font-size: 1em;
             cursor: pointer;
-            transition: all 0.3s;
             font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s;
         }
 
-        .restart-button:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .copy-notification {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .copy-notification.show {
+            display: block;
+            animation: slideUp 0.3s;
         }
 
         .loading {
@@ -199,17 +295,20 @@
 
         /* 스크롤바 스타일링 */
         .story-container::-webkit-scrollbar,
-        .choices::-webkit-scrollbar {
+        .choices::-webkit-scrollbar,
+        .ending-content::-webkit-scrollbar {
             width: 8px;
         }
 
         .story-container::-webkit-scrollbar-track,
-        .choices::-webkit-scrollbar-track {
+        .choices::-webkit-scrollbar-track,
+        .ending-content::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
 
         .story-container::-webkit-scrollbar-thumb,
-        .choices::-webkit-scrollbar-thumb {
+        .choices::-webkit-scrollbar-thumb,
+        .ending-content::-webkit-scrollbar-thumb {
             background: #667eea;
             border-radius: 4px;
         }
@@ -220,6 +319,8 @@
             .story-container { padding: 15px; }
             .choices { padding: 12px 15px; }
             .choice-button { padding: 12px 16px; font-size: 0.9em; }
+            .ending-title { font-size: 1.5em; }
+            .ending-body { padding: 20px; }
         }
     </style>
 </head>
@@ -239,13 +340,55 @@
         </div>
     </div>
 
+    <!-- 엔딩 모달 -->
+    <div class="ending-modal" id="endingModal">
+        <div class="ending-content">
+            <div class="ending-image" id="endingImage">
+                🎭
+            </div>
+            <div class="ending-body">
+                <div class="ending-title" id="endingTitle">이야기가 끝났습니다</div>
+                <div class="ending-description" id="endingDescription">
+                    호건이를 찾는 여정이 끝났습니다.
+                </div>
+                <div class="ending-actions">
+                    <button class="btn btn-primary" onclick="copyEndingText()">
+                        📋 공유 텍스트 복사
+                    </button>
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        🔄 다시 시작하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 복사 알림 -->
+    <div class="copy-notification" id="copyNotification">
+        ✅ 클립보드에 복사되었습니다!
+    </div>
+
     <!-- inkjs 라이브러리 로드 (버전 2.3.0) -->
     <script src="https://unpkg.com/inkjs@2.3.0/dist/ink.js"></script>
 
     <script>
         let story;
+        let currentEnding = null;
         const storyContainer = document.getElementById('story');
         const choicesContainer = document.getElementById('choices');
+
+        // 엔딩 정보 맵
+        const endings = {
+            'lotto': { title: '로또 당첨의 고독', emoji: '🎰', desc: '돈은 모든 걸 해결하지 못한다.' },
+            'ship': { title: '바다의 남자', emoji: '🚢', desc: '어떤 길을 가든, 친구는 친구다.' },
+            'coma': { title: '잠든 친구', emoji: '🏥', desc: '기다림은 끝나지 않는다.' },
+            'witness': { title: '증인의 귀환', emoji: '🛡️', desc: '정의를 위한 희생도 있다.' },
+            'fantasy': { title: '이세계 전이 전설', emoji: '✨', desc: '믿거나 말거나.' },
+            'spy': { title: '그림자 요원', emoji: '👁️', desc: '어떤 영웅은 빛을 받지 않는다.' },
+            'religion': { title: '깨달음의 길', emoji: '🙏', desc: '각자의 평화를 찾는 법은 다르다.' },
+            'business': { title: '재기의 섬', emoji: '💼', desc: '실패는 끝이 아니다.' },
+            'prison': { title: '속죄와 용서', emoji: '⚖️', desc: '과거는 지울 수 없지만, 미래는 만들 수 있다.' }
+        };
 
         // 스토리 로드
         fetch('story.json')
@@ -286,11 +429,18 @@
                         // 이전 블록 마감
                         currentBlock = null;
                         
+                        // 엔딩 헤더 감지
+                        const headerText = line.replace('# ', '').trim();
+                        if (headerText.startsWith('엔딩')) {
+                            // 엔딩 타입 감지
+                            detectEnding(headerText);
+                        }
+                        
                         // 헤더 추가
                         const headerDiv = document.createElement('div');
                         headerDiv.className = 'chapter-header';
                         const h1 = document.createElement('h1');
-                        h1.textContent = line.replace('# ', '').trim();
+                        h1.textContent = headerText;
                         headerDiv.appendChild(h1);
                         storyContainer.appendChild(headerDiv);
                     } else {
@@ -328,17 +478,53 @@
                     choicesContainer.appendChild(button);
                 });
             } else {
-                // 스토리 끝
-                choicesContainer.style.display = 'block';
-                choicesContainer.innerHTML = `
-                    <div class="game-end">
-                        <h2>🎭 이야기가 끝났습니다</h2>
-                        <button class="restart-button" onclick="location.reload()">
-                            🔄 다시 시작하기
-                        </button>
-                    </div>
-                `;
+                // 스토리 끝 - 엔딩 모달 표시
+                choicesContainer.style.display = 'none';
+                showEndingModal();
             }
+        }
+
+        function detectEnding(headerText) {
+            // "엔딩 1: 로또 당첨" 같은 형식에서 타입 추출
+            if (headerText.includes('로또')) currentEnding = 'lotto';
+            else if (headerText.includes('원양') || headerText.includes('바다')) currentEnding = 'ship';
+            else if (headerText.includes('코마') || headerText.includes('잠든')) currentEnding = 'coma';
+            else if (headerText.includes('증인')) currentEnding = 'witness';
+            else if (headerText.includes('이세계')) currentEnding = 'fantasy';
+            else if (headerText.includes('국정원') || headerText.includes('요원')) currentEnding = 'spy';
+            else if (headerText.includes('종교') || headerText.includes('출가') || headerText.includes('깨달음')) currentEnding = 'religion';
+            else if (headerText.includes('사업') || headerText.includes('재기')) currentEnding = 'business';
+            else if (headerText.includes('출소') || headerText.includes('속죄')) currentEnding = 'prison';
+        }
+
+        function showEndingModal() {
+            const modal = document.getElementById('endingModal');
+            const endingData = endings[currentEnding] || endings.ship; // fallback
+            
+            document.getElementById('endingImage').textContent = endingData.emoji;
+            document.getElementById('endingTitle').textContent = endingData.title;
+            document.getElementById('endingDescription').textContent = endingData.desc;
+            
+            modal.classList.add('show');
+        }
+
+        function copyEndingText() {
+            const endingData = endings[currentEnding] || endings.ship;
+            const shareText = `🔍 호건이를 찾아서
+
+${endingData.emoji} ${endingData.title}
+${endingData.desc}
+
+9년 만에 호건이를 찾았습니다.
+나도 플레이하기: https://oringnam.github.io/hogeon-mystery/`;
+
+            navigator.clipboard.writeText(shareText).then(() => {
+                const notification = document.getElementById('copyNotification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            });
         }
 
         function selectChoice(index, choiceText) {
