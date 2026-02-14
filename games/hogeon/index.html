@@ -565,11 +565,10 @@
     <div class="game-container">
         <div class="game-header">
             <div class="header-buttons">
+                <button class="header-btn" onclick="showBGMSelector()">🎵 BGM</button>
                 <button class="header-btn" onclick="showClues()">📋 단서</button>
             </div>
-            <h1>🔍 호건이를 찾아서</h1>
-            <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.23 (2026-02-14 20:05 KST) - Dark Fog BGM (cache fix) 🌫️</div>
+            <h1 style="cursor: pointer;" onclick="window.location.href='../../'">🔍 호건이를 찾아서</h1>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -637,32 +636,49 @@
         const storyContainer = document.getElementById('story');
         const choicesContainer = document.getElementById('choices');
 
-        // 🎵 Audio Manager (단일 BGM - investigation.mp3)
+        // 🎵 Audio Manager (다중 BGM 선택 가능)
         const AudioManager = {
             current: null,
             enabled: true,
             started: false,
+            currentTrack: 'dark-fog',
+            
+            tracks: {
+                'dark-fog': { file: 'dark-fog-bgm.mp3', name: 'Dark Fog', desc: '어두운 미스터리' },
+                'investigations': { file: 'investigation-old.mp3', name: 'Investigations', desc: '가벼운 탐정' },
+                'sneaky': { file: 'mystery-new.mp3', name: 'Sneaky Snitch', desc: '코믹 탐정' }
+            },
             
             play(track, loop = true, volume = 0.3) {
                 if (!this.enabled) return;
                 
-                // 이미 재생 중이면 그대로 유지
-                if (this.current && !this.current.paused) {
+                // track 파라미터가 없으면 현재 트랙 사용
+                const trackKey = track || this.currentTrack;
+                
+                // 이미 같은 곡이 재생 중이면 유지
+                if (this.current && !this.current.paused && trackKey === this.currentTrack) {
                     console.log('🎵 Already playing, continuing...');
                     return;
                 }
                 
-                // 첫 재생 시작
-                if (!this.started) {
-                    this.current = new Audio(`../../sounds/dark-fog-bgm.mp3`);
-                    this.current.volume = volume;
-                    this.current.loop = true; // 항상 루프
-                    this.current.play().catch(e => {
-                        console.log('🔇 Audio autoplay blocked (first click needed):', e.message);
-                    });
-                    this.started = true;
-                    console.log('🎵 BGM started (Dark Fog - dark mystery loop)');
+                // 기존 재생 중지 (곡 전환 시)
+                if (this.current) {
+                    this.current.pause();
+                    this.current = null;
                 }
+                
+                // 새 트랙 재생
+                const trackInfo = this.tracks[trackKey];
+                this.current = new Audio(`../../sounds/${trackInfo.file}`);
+                this.current.volume = volume;
+                this.current.loop = true;
+                this.current.play().catch(e => {
+                    console.log('🔇 Audio autoplay blocked (first click needed):', e.message);
+                });
+                this.currentTrack = trackKey;
+                this.started = true;
+                localStorage.setItem('bgm_track', trackKey);
+                console.log(`🎵 BGM started: ${trackInfo.name}`);
             },
             
             stop() {
@@ -679,12 +695,17 @@
                 if (!this.enabled) {
                     this.stop();
                 } else if (!this.started) {
-                    // 켜질 때 재생 시작
                     this.play();
                 }
                 localStorage.setItem('bgm_enabled', this.enabled);
                 console.log(`🔊 BGM ${this.enabled ? 'enabled' : 'disabled'}`);
                 return this.enabled;
+            },
+            
+            changeTrack(trackKey) {
+                this.currentTrack = trackKey;
+                this.started = false;
+                this.play(trackKey);
             }
         };
 
@@ -692,6 +713,10 @@
         const savedBgmState = localStorage.getItem('bgm_enabled');
         if (savedBgmState !== null) {
             AudioManager.enabled = savedBgmState === 'true';
+        }
+        const savedBgmTrack = localStorage.getItem('bgm_track');
+        if (savedBgmTrack && AudioManager.tracks[savedBgmTrack]) {
+            AudioManager.currentTrack = savedBgmTrack;
         }
 
         // ⌨️ Typewriter Effect Manager
@@ -807,7 +832,7 @@
         };
 
         // 스토리 로드 (버전 파라미터로 캐시 우회)
-        fetch('story.json?v=3.23')
+        fetch('story.json?v=3.24')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('story.json을 찾을 수 없습니다. 먼저 컴파일 해주세요.');
@@ -1381,6 +1406,113 @@ https://oringnam.github.io/hogeon-mystery/`;
         // 단서 노트 숨기기
         function hideClues() {
             document.getElementById('clueModal').classList.remove('show');
+        }
+
+        // BGM 선택 모달
+        function showBGMSelector() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 24px;
+                border-radius: 12px;
+                max-width: 400px;
+                width: 100%;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            
+            const tracks = AudioManager.tracks;
+            const currentTrack = AudioManager.currentTrack;
+            
+            let trackButtons = '';
+            Object.keys(tracks).forEach(key => {
+                const track = tracks[key];
+                const isActive = key === currentTrack;
+                trackButtons += `
+                    <button 
+                        onclick="selectBGM('${key}')"
+                        style="
+                            width: 100%;
+                            padding: 16px;
+                            margin-bottom: 12px;
+                            background: ${isActive ? '#667eea' : '#f0f0f0'};
+                            color: ${isActive ? 'white' : '#333'};
+                            border: ${isActive ? '2px solid #764ba2' : '2px solid transparent'};
+                            border-radius: 8px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            text-align: left;
+                            transition: all 0.2s;
+                        "
+                        onmouseover="this.style.background='${isActive ? '#764ba2' : '#e0e0e0'}'"
+                        onmouseout="this.style.background='${isActive ? '#667eea' : '#f0f0f0'}'"
+                    >
+                        <div style="font-size: 16px; margin-bottom: 4px;">
+                            ${isActive ? '🎵 ' : ''}${track.name}
+                        </div>
+                        <div style="font-size: 13px; opacity: 0.8;">
+                            ${track.desc}
+                        </div>
+                    </button>
+                `;
+            });
+            
+            content.innerHTML = `
+                <h3 style="margin: 0 0 16px 0; color: #333;">🎵 배경음악 선택</h3>
+                ${trackButtons}
+                <button 
+                    onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        background: #e0e0e0;
+                        color: #333;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 15px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin-top: 8px;
+                    "
+                >
+                    닫기
+                </button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // 모달 외부 클릭 시 닫기
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // BGM 선택 처리
+        function selectBGM(trackKey) {
+            AudioManager.changeTrack(trackKey);
+            // 모달 닫기
+            const modal = document.querySelector('[style*="position: fixed"]');
+            if (modal) modal.remove();
+            // 알림
+            showNotification(`🎵 ${AudioManager.tracks[trackKey].name} 재생 중`);
         }
 
         // Service Worker 등록 (캐싱으로 빠른 재방문)
