@@ -307,9 +307,25 @@ VAR checked_records = false
 ~ visited_university = true
 ~ investigation_depth++
 
+{ checked_sns or talked_to_family:
+    { checked_sns and talked_to_family:
+        진원이 말했다. "SNS에 '인생 역전'이라 썼고, 어머니 수술도 있었고... 학교는 어떻게 됐을까?"
+    }
+    { checked_sns and not talked_to_family:
+        "2017년 초에 SNS 활동이 멈췄잖아. 학교도 뭔가 있지 않았을까?"
+    }
+    { not checked_sns and talked_to_family:
+        "어머니 수술 시기랑 겹치는데... 학교는 계속 다녔을까?"
+    }
+}
+
 효배가 교사 인맥을 동원해서 동국대 학적 기록을 알아봤다.
 
 "2017년 2월에 휴학계 냈네. 사유는... '개인 사정'."
+
+{ talked_to_family:
+    정호가 고개를 끄덕였다. "어머니 수술이 그때쯤이었어."
+}
 
 "그 후로는?"
 
@@ -353,6 +369,22 @@ VAR checked_records = false
 === check_public_records ===
 ~ checked_records = true
 ~ investigation_depth++
+
+{ investigation_depth >= 3:
+    현이 말했다. "이제 단서가 꽤 모였어. 공공 기록을 확인하면 뭔가 나올 것 같은데."
+    
+    { checked_sns:
+        "SNS에서 '인생 역전'이라고 했으니..."
+    }
+    { talked_to_family:
+        "어머니 수술 시기도 알고 있고..."
+    }
+    { visited_university:
+        "휴학 기록도 있고..."
+    }
+    
+    "이제 정부 기록을 봐야 해."
+}
 
 현이 정부24, 법원 사이트, 공공 데이터를 뒤졌다.
 
@@ -569,7 +601,18 @@ VAR checked_records = false
 
 "직접 발로 뛰어보자."
 
+{ talked_to_family:
+    정호가 말했다. "어머니가 가끔 생활비를 받는다고 했잖아. 그 출처를 추적해보면..."
+}
+
 + [부산으로 가보자]
+    { talked_to_family:
+        "생활비 송금 기록에 부산 선박회사가 있었어."
+    }
+    { not talked_to_family:
+        "혹시 어디 멀리 간 건 아닐까? 부산 쪽 알아보자."
+    }
+    
     정호와 의진이 부산으로 내려갔다.
     
     선박회사 인사팀에서 확인한 결과...
@@ -578,6 +621,10 @@ VAR checked_records = false
     
     ~ clue_ship = true
     ~ investigation_depth++
+    
+    { talked_to_family:
+        정호가 무릎을 쳤다. "그래서 어머니께 생활비를 보낼 수 있었던 거구나!"
+    }
     
     "연락 가능한가요?"
     
@@ -588,6 +635,13 @@ VAR checked_records = false
     -> investigation_hub
 
 + [병원 기록을 확인하자]
+    { checked_records:
+        "공공 기록에 교통사고가 있었잖아."
+    }
+    { checked_sns:
+        "SNS에 '다른 세계로'라고 쓴 게... 혹시 사고 전조였을까?"
+    }
+    
     범환과 진원이 병원을 찾았다.
     
     보호자 확인 후 면회실로 안내되었다.
@@ -601,11 +655,19 @@ VAR checked_records = false
     ~ clue_hospital = true
     ~ investigation_depth++
     
+    { checked_sns:
+        진원이 눈물을 흘렸다. "'다른 세계로 가고 싶다'고 했는데... 이런 의미였어?"
+    }
+    
     "이럴 수가..."
     
     -> investigation_hub
 
 + [경찰에 문의하자]
+    { checked_records:
+        "법원 기록에 증인 출석이 있었어. 경찰에 물어보면..."
+    }
+    
     현식과 형준이 경찰서를 찾았다.
     
     형사가 조심스럽게 말했다.
@@ -619,11 +681,22 @@ VAR checked_records = false
     ~ clue_witness = true
     ~ investigation_depth++
     
+    { checked_records:
+        형준이 고개를 끄덕였다. "그래서 증인으로 법정에 섰던 거구나."
+    }
+    
     "증인보호라니... 뭔 일이 있었던 거야?"
     
     -> investigation_hub
 
 + [종교 시설을 알아보자]
+    { visited_university:
+        "대학 근처에서 절에 자주 갔다는 목격담이 있었잖아."
+    }
+    { checked_sns:
+        "SNS에 '이 세계는 지겹다'고 썼으니... 출가했을 수도?"
+    }
+    
     효배와 재원이 동국대 주변 종교 시설을 돌았다.
     
     한 스님이 기억했다.
@@ -633,11 +706,19 @@ VAR checked_records = false
     ~ clue_religion = true
     ~ investigation_depth++
     
+    { checked_sns:
+        효배가 한숨을 쉬었다. "세상이 지겹다고 했더니... 정말 떠난 거야."
+    }
+    
     "출가라니... 무슨 일이 있었을까?"
     
     -> investigation_hub
 
 + [교정시설을 알아보자]
+    { checked_records:
+        "법원 기록에 피고인으로 나왔잖아. 지금은..."
+    }
+    
     범환이 법무부 홈페이지를 뒤졌다.
     
     "...재소자 명단에 이름이 있어."
@@ -649,11 +730,22 @@ VAR checked_records = false
     ~ clue_prison = true
     ~ investigation_depth++
     
+    { checked_records:
+        "교통사고 치사... 그때 법정에 섰던 거구나."
+    }
+    
     "감옥에...? 도대체 무슨 일이..."
     
     -> investigation_hub
 
 + [사업 실패 흔적을 찾아보자]
+    { talked_to_family:
+        "어머니 수술비 때문에 사업을 했을 수도 있어."
+    }
+    { checked_records:
+        "공공 기록에 사업자등록이 있었잖아."
+    }
+    
     진원이 신용정보원 자료를 확인했다.
     
     "대출 연체 기록이... 엄청나네."
@@ -664,6 +756,10 @@ VAR checked_records = false
     
     ~ clue_business = true
     ~ investigation_depth++
+    
+    { talked_to_family:
+        정호가 안타까워했다. "어머니를 위해서였는데... 결국 실패했구나."
+    }
     
     "빚 때문에 숨은 걸까?"
     
