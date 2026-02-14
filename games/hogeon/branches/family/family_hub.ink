@@ -33,7 +33,7 @@
     ~ current_path = "ship"
     -> family_ship_branch
 
-* [어머니 건강 상태 확인]
+* [호건이 경제 상황 물어보기]
     ~ current_path = "money"
     -> family_money_branch
 
