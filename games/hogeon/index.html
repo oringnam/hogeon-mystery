@@ -377,15 +377,76 @@
         .ending-description {
             color: #666;
             line-height: 1.8;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: center;
             font-size: 1.05em;
+        }
+
+        .ending-stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
         }
 
         .ending-actions {
             display: flex;
             gap: 10px;
             flex-direction: column;
+        }
+
+        .btn-share {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .btn-share:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-kakao {
+            border-color: #FEE500;
+            color: #3C1E1E;
+        }
+
+        .btn-kakao:hover {
+            background: #FEE500;
+        }
+
+        .btn-twitter {
+            border-color: #1DA1F2;
+            color: #1DA1F2;
+        }
+
+        .btn-twitter:hover {
+            background: #1DA1F2;
+            color: white;
+        }
+
+        .btn-copy {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .btn-copy:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-url {
+            border-color: #34a853;
+            color: #34a853;
+        }
+
+        .btn-url:hover {
+            background: #34a853;
+            color: white;
         }
 
         .btn {
@@ -483,7 +544,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.0 (2026-02-14 16:11 KST) - Modular Branching</div>
+            <div class="version-info">v3.1 (2026-02-14 16:17 KST) - Enhanced Sharing</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -511,9 +572,19 @@
                 <div class="ending-description" id="endingDescription">
                     호건이를 찾는 여정이 끝났습니다.
                 </div>
+                <div class="ending-stats" id="endingStats"></div>
                 <div class="ending-actions">
-                    <button class="btn btn-primary" onclick="copyEndingText()">
+                    <button class="btn btn-share btn-kakao" onclick="shareKakao()">
+                        💬 카카오톡 공유
+                    </button>
+                    <button class="btn btn-share btn-twitter" onclick="shareTwitter()">
+                        🐦 X (트위터) 공유
+                    </button>
+                    <button class="btn btn-share btn-copy" onclick="copyEndingText()">
                         📋 공유 텍스트 복사
+                    </button>
+                    <button class="btn btn-share btn-url" onclick="copyURL()">
+                        🔗 URL 복사
                     </button>
                     <button class="btn btn-secondary" onclick="location.reload()">
                         🔄 다시 시작하기
@@ -772,26 +843,96 @@
             
             document.getElementById('endingDescription').textContent = description;
             
+            // 통계 정보 표시
+            const statsHTML = `
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #667eea;">${endingCount}</div>
+                        <div style="font-size: 0.85em;">수집한 엔딩</div>
+                    </div>
+                    <div style="border-left: 1px solid #ddd;"></div>
+                    <div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #764ba2;">9</div>
+                        <div style="font-size: 0.85em;">전체 엔딩</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('endingStats').innerHTML = statsHTML;
+            
             modal.classList.add('show');
         }
 
-        function copyEndingText() {
+        function getShareText() {
             const endingData = endings[currentEnding] || endings.ship;
-            const shareText = `🔍 호건이를 찾아서
+            const collectedEndings = getCollectedEndings().length;
+            return {
+                text: `🔍 호건이를 찾아서\n\n${endingData.emoji} ${endingData.title}\n\n나는 ${collectedEndings}/9개 엔딩을 수집했어!\n너도 호건이를 찾아봐!`,
+                url: 'https://oringnam.github.io/hogeon-mystery/',
+                hashtags: ['호건이를찾아서', '인터랙티브스토리']
+            };
+        }
 
-${endingData.emoji} ${endingData.title}
-${endingData.desc}
+        function shareKakao() {
+            if (!window.Kakao) {
+                alert('카카오톡 공유는 모바일에서만 지원됩니다.');
+                return;
+            }
+            
+            const { text, url } = getShareText();
+            const endingData = endings[currentEnding] || endings.ship;
+            
+            Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: '호건이를 찾아서',
+                    description: `${endingData.emoji} ${endingData.title}\n\n9년 만에 친구를 찾았어!`,
+                    imageUrl: 'https://oringnam.github.io/hogeon-mystery/og-image.png',
+                    link: {
+                        mobileWebUrl: url,
+                        webUrl: url
+                    }
+                },
+                buttons: [
+                    {
+                        title: '나도 플레이하기',
+                        link: {
+                            mobileWebUrl: url,
+                            webUrl: url
+                        }
+                    }
+                ]
+            });
+        }
 
-9년 만에 호건이를 찾았습니다.
-나도 플레이하기: https://oringnam.github.io/hogeon-mystery/`;
+        function shareTwitter() {
+            const { text, url, hashtags } = getShareText();
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${hashtags.join(',')}`;
+            window.open(twitterUrl, '_blank', 'width=550,height=420');
+        }
+
+        function copyEndingText() {
+            const { text, url } = getShareText();
+            const shareText = `${text}\n\n${url}`;
 
             navigator.clipboard.writeText(shareText).then(() => {
-                const notification = document.getElementById('copyNotification');
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 2000);
+                showNotification('✅ 클립보드에 복사되었습니다!');
             });
+        }
+
+        function copyURL() {
+            const { url } = getShareText();
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification('🔗 URL이 복사되었습니다!');
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('copyNotification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
         }
 
         function selectChoice(index, choiceText) {
