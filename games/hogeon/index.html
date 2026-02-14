@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>호건이를 찾아서</title>
+    <title>호건이를 찾아서 - 9년 만의 미스터리</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://oringnam.github.io/hogeon-mystery/">
+    <meta property="og:title" content="호건이를 찾아서">
+    <meta property="og:description" content="2017년부터 연락이 끊긴 친구. 9명의 친구들이 그를 찾아 나섭니다. 당신의 선택이 진실을 결정합니다.">
+    <meta property="og:image" content="https://oringnam.github.io/hogeon-mystery/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://oringnam.github.io/hogeon-mystery/">
+    <meta property="twitter:title" content="호건이를 찾아서">
+    <meta property="twitter:description" content="2017년부터 연락이 끊긴 친구. 9명의 친구들이 그를 찾아 나섭니다.">
+    <meta property="twitter:image" content="https://oringnam.github.io/hogeon-mystery/og-image.png">
+    
+    <!-- Kakao SDK -->
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -544,7 +561,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.1 (2026-02-14 16:17 KST) - Enhanced Sharing</div>
+            <div class="version-info">v3.2 (2026-02-14 16:22 KST) - Complete Edition</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -873,35 +890,44 @@
         }
 
         function shareKakao() {
-            if (!window.Kakao) {
-                alert('카카오톡 공유는 모바일에서만 지원됩니다.');
+            if (!window.Kakao || !Kakao.isInitialized()) {
+                // Fallback: URL 복사
+                copyURL();
+                alert('카카오톡 SDK가 초기화되지 않았습니다.\n대신 URL이 복사되었습니다!');
                 return;
             }
             
             const { text, url } = getShareText();
             const endingData = endings[currentEnding] || endings.ship;
+            const collectedEndings = getCollectedEndings().length;
             
-            Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: '호건이를 찾아서',
-                    description: `${endingData.emoji} ${endingData.title}\n\n9년 만에 친구를 찾았어!`,
-                    imageUrl: 'https://oringnam.github.io/hogeon-mystery/og-image.png',
-                    link: {
-                        mobileWebUrl: url,
-                        webUrl: url
-                    }
-                },
-                buttons: [
-                    {
-                        title: '나도 플레이하기',
+            try {
+                Kakao.Share.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: '🔍 호건이를 찾아서',
+                        description: `${endingData.emoji} ${endingData.title}\n\n나는 ${collectedEndings}/9개 엔딩을 수집했어!`,
+                        imageUrl: 'https://oringnam.github.io/hogeon-mystery/og-image.png',
                         link: {
                             mobileWebUrl: url,
                             webUrl: url
                         }
-                    }
-                ]
-            });
+                    },
+                    buttons: [
+                        {
+                            title: '나도 플레이하기',
+                            link: {
+                                mobileWebUrl: url,
+                                webUrl: url
+                            }
+                        }
+                    ]
+                });
+            } catch (err) {
+                console.error('카카오톡 공유 실패:', err);
+                copyURL();
+                alert('카카오톡 공유에 실패했습니다.\nURL이 복사되었습니다!');
+            }
         }
 
         function shareTwitter() {
@@ -1016,6 +1042,12 @@
             navigator.serviceWorker.register('/sw.js')
                 .then(() => console.log('✅ 캐싱 활성화'))
                 .catch(err => console.log('Service Worker 등록 실패:', err));
+        }
+
+        // 카카오 SDK 초기화
+        if (window.Kakao) {
+            Kakao.init('YOUR_KAKAO_APP_KEY'); // TODO: 실제 앱 키로 교체 필요
+            console.log('✅ 카카오 SDK 초기화:', Kakao.isInitialized());
         }
     </script>
 </body>
