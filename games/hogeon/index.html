@@ -483,7 +483,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v1.2 (2026-02-14 15:22 KST)</div>
+            <div class="version-info">v1.3 (2026-02-14 15:32 KST)</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -610,10 +610,14 @@
             while (story.canContinue) {
                 const line = story.Continue();
                 
-                // 태그 체크 (이미지)
+                // 태그 체크 (엔딩 타입 + 이미지)
                 const tags = story.currentTags;
                 if (tags && tags.length > 0) {
                     tags.forEach(tag => {
+                        if (tag.startsWith('ENDING:')) {
+                            currentEnding = tag.replace('ENDING:', '').trim();
+                            console.log('✅ Ending detected:', currentEnding);
+                        }
                         if (tag.startsWith('IMAGE:')) {
                             const filename = tag.replace('IMAGE:', '').trim();
                             renderImage(filename);

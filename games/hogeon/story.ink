@@ -435,38 +435,68 @@ VAR checked_records = false
 
 === final_deduction ===
 
-각자가 추론한 가능성들:
+친구들이 수집한 단서를 종합했다.
+
+"각자 추론해본 가능성을 말해보자."
+
+// 디버깅: 수집한 단서 확인
+{clue_lotto: "- 로또 당첨 단서 있음"}
+{clue_ship: "- 원양어선 단서 있음"}
+{clue_witness: "- 증인보호 단서 있음"}
+{clue_hospital: "- 교통사고 단서 있음"}
+{clue_fantasy: "- 이세계 단서 있음"}
+{clue_spy: "- 국정원 단서 있음"}
+{clue_religion: "- 출가 단서 있음"}
+{clue_business: "- 사업 실패 단서 있음"}
+{clue_prison: "- 복역 중 단서 있음"}
+
+침묵이 흘렀다.
+
+"어떻게 생각해?"
 
 + {clue_lotto} ["돈 때문이었을까?"]
+    "로또 당첨 기록이 있었잖아."
     -> ending_lotto
 
 + {clue_ship} ["바다로 떠났을까?"]
+    "부산 선박회사 기록을 봤어."
     -> ending_ship
 
 + {clue_witness} ["누군가에게 쫓기고 있을까?"]
+    "증인보호 얘기가 나왔잖아."
     -> ending_witness
 
 + {clue_hospital} ["사고를 당했을까?"]
+    "병원 기록에 장기 입원이..."
     -> ending_coma
 
 + {clue_fantasy} ["정말로... 사라진 걸까?"]
+    "원룸에서 이상한 흔적을..."
     -> ending_fantasy
 
 + {clue_spy} ["국가를 위해 일하고 있을까?"]
+    "갑자기 체력 단련, 정보보안..."
     -> ending_spy
 
 + {clue_religion} ["마음의 평화를 찾았을까?"]
+    "출가 기록이 있었어."
     -> ending_religion
 
 + {clue_business} ["빚 때문에 숨었을까?"]
+    "사업 실패, 엄청난 빚..."
     -> ending_business
 
 + {clue_prison} ["과거의 잘못 때문일까?"]
+    "법원 기록에 피고인으로..."
     -> ending_prison
 
-+ ["더 조사가 필요해"]
++ {investigation_depth >= 2} ["더 조사가 필요해"]
     "아직 확실하지 않아. 더 파보자."
     -> deeper_investigation
+
++ {investigation_depth < 2} ["단서가 부족해. 더 조사하자"]
+    "이 정도론 부족해. 제대로 파보자."
+    -> investigation_hub
 
 // ========================================
 // 심화 조사
@@ -583,6 +613,7 @@ VAR checked_records = false
 // ========================================
 
 === ending_lotto ===
+# ENDING: lotto
 # IMAGE: ending_lotto.png
 # 엔딩 1: 로또 당첨
 
@@ -637,6 +668,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_ship ===
+# ENDING: ship
 # IMAGE: ending_ship.png
 # 엔딩 2: 원양어선
 
@@ -675,6 +707,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_coma ===
+# ENDING: coma
 # IMAGE: ending_hospital.png
 # 엔딩 3: 깨어나지 못한 친구
 
@@ -711,6 +744,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_witness ===
+# ENDING: witness
 # IMAGE: ending_witness.png
 # 엔딩 4: 증인보호
 
@@ -751,6 +785,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_fantasy ===
+# ENDING: fantasy
 # IMAGE: ending_isekai.png
 # 엔딩 5: 이세계 전이 (?)
 
@@ -795,6 +830,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_spy ===
+# ENDING: spy
 # IMAGE: ending_spy.png
 # 엔딩 6: 국정원 요원
 
@@ -833,6 +869,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_religion ===
+# ENDING: religion
 # IMAGE: ending_religion.png
 # 엔딩 7: 출가
 
@@ -879,6 +916,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_business ===
+# ENDING: business
 # IMAGE: ending_business.png
 # 엔딩 8: 사업 실패와 재기
 
@@ -923,6 +961,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_prison ===
+# ENDING: prison
 # IMAGE: ending_prison.png
 # 엔딩 9: 출소
 
