@@ -18,9 +18,6 @@
     <meta property="twitter:title" content="호건이를 찾아서">
     <meta property="twitter:description" content="2017년부터 연락이 끊긴 친구. 9명의 친구들이 그를 찾아 나섭니다.">
     <meta property="twitter:image" content="https://oringnam.github.io/hogeon-mystery/og-image.png">
-    
-    <!-- Kakao SDK -->
-    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -415,57 +412,6 @@
             flex-direction: column;
         }
 
-        .btn-share {
-            background: white;
-            border: 2px solid #e0e0e0;
-            color: #333;
-            transition: all 0.2s;
-        }
-
-        .btn-share:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn-kakao {
-            border-color: #FEE500;
-            color: #3C1E1E;
-        }
-
-        .btn-kakao:hover {
-            background: #FEE500;
-        }
-
-        .btn-twitter {
-            border-color: #1DA1F2;
-            color: #1DA1F2;
-        }
-
-        .btn-twitter:hover {
-            background: #1DA1F2;
-            color: white;
-        }
-
-        .btn-copy {
-            border-color: #667eea;
-            color: #667eea;
-        }
-
-        .btn-copy:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-url {
-            border-color: #34a853;
-            color: #34a853;
-        }
-
-        .btn-url:hover {
-            background: #34a853;
-            color: white;
-        }
-
         .btn {
             padding: 15px 25px;
             border: none;
@@ -561,7 +507,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.3 (2026-02-14 16:26 KST) - Rich Story + Bugfix</div>
+            <div class="version-info">v3.4 (2026-02-14 16:29 KST) - Simplified Sharing</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -591,17 +537,8 @@
                 </div>
                 <div class="ending-stats" id="endingStats"></div>
                 <div class="ending-actions">
-                    <button class="btn btn-share btn-kakao" onclick="shareKakao()">
-                        💬 카카오톡 공유
-                    </button>
-                    <button class="btn btn-share btn-twitter" onclick="shareTwitter()">
-                        🐦 X (트위터) 공유
-                    </button>
-                    <button class="btn btn-share btn-copy" onclick="copyEndingText()">
-                        📋 공유 텍스트 복사
-                    </button>
-                    <button class="btn btn-share btn-url" onclick="copyURL()">
-                        🔗 URL 복사
+                    <button class="btn btn-primary" onclick="copyEndingText()">
+                        📤 공유하기
                     </button>
                     <button class="btn btn-secondary" onclick="location.reload()">
                         🔄 다시 시작하기
@@ -879,86 +816,27 @@
             modal.classList.add('show');
         }
 
-        function getShareText() {
-            const endingData = endings[currentEnding] || endings.ship;
-            const collectedEndings = getCollectedEndings().length;
-            return {
-                text: `🔍 호건이를 찾아서\n\n${endingData.emoji} ${endingData.title}\n\n나는 ${collectedEndings}/9개 엔딩을 수집했어!\n너도 호건이를 찾아봐!`,
-                url: 'https://oringnam.github.io/hogeon-mystery/',
-                hashtags: ['호건이를찾아서', '인터랙티브스토리']
-            };
-        }
-
-        function shareKakao() {
-            if (!window.Kakao || !Kakao.isInitialized()) {
-                // Fallback: URL 복사
-                copyURL();
-                alert('카카오톡 SDK가 초기화되지 않았습니다.\n대신 URL이 복사되었습니다!');
-                return;
-            }
-            
-            const { text, url } = getShareText();
-            const endingData = endings[currentEnding] || endings.ship;
-            const collectedEndings = getCollectedEndings().length;
-            
-            try {
-                Kakao.Share.sendDefault({
-                    objectType: 'feed',
-                    content: {
-                        title: '🔍 호건이를 찾아서',
-                        description: `${endingData.emoji} ${endingData.title}\n\n나는 ${collectedEndings}/9개 엔딩을 수집했어!`,
-                        imageUrl: 'https://oringnam.github.io/hogeon-mystery/og-image.png',
-                        link: {
-                            mobileWebUrl: url,
-                            webUrl: url
-                        }
-                    },
-                    buttons: [
-                        {
-                            title: '나도 플레이하기',
-                            link: {
-                                mobileWebUrl: url,
-                                webUrl: url
-                            }
-                        }
-                    ]
-                });
-            } catch (err) {
-                console.error('카카오톡 공유 실패:', err);
-                copyURL();
-                alert('카카오톡 공유에 실패했습니다.\nURL이 복사되었습니다!');
-            }
-        }
-
-        function shareTwitter() {
-            const { text, url, hashtags } = getShareText();
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${hashtags.join(',')}`;
-            window.open(twitterUrl, '_blank', 'width=550,height=420');
-        }
-
         function copyEndingText() {
-            const { text, url } = getShareText();
-            const shareText = `${text}\n\n${url}`;
+            const endingData = endings[currentEnding] || endings.ship;
+            const collectedEndings = getCollectedEndings().length;
+            
+            const shareText = `🔍 호건이를 찾아서
+
+${endingData.emoji} ${endingData.title}
+
+나는 ${collectedEndings}/9개 엔딩을 수집했어!
+너도 호건이를 찾아봐!
+
+https://oringnam.github.io/hogeon-mystery/`;
 
             navigator.clipboard.writeText(shareText).then(() => {
-                showNotification('✅ 클립보드에 복사되었습니다!');
+                const notification = document.getElementById('copyNotification');
+                notification.textContent = '✅ 공유 텍스트가 복사되었습니다!';
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
             });
-        }
-
-        function copyURL() {
-            const { url } = getShareText();
-            navigator.clipboard.writeText(url).then(() => {
-                showNotification('🔗 URL이 복사되었습니다!');
-            });
-        }
-
-        function showNotification(message) {
-            const notification = document.getElementById('copyNotification');
-            notification.textContent = message;
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 2000);
         }
 
         function selectChoice(index, choiceText) {
@@ -1042,12 +920,6 @@
             navigator.serviceWorker.register('/sw.js')
                 .then(() => console.log('✅ 캐싱 활성화'))
                 .catch(err => console.log('Service Worker 등록 실패:', err));
-        }
-
-        // 카카오 SDK 초기화
-        if (window.Kakao) {
-            Kakao.init('YOUR_KAKAO_APP_KEY'); // TODO: 실제 앱 키로 교체 필요
-            console.log('✅ 카카오 SDK 초기화:', Kakao.isInitialized());
         }
     </script>
 </body>
