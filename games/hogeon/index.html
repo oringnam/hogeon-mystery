@@ -565,7 +565,6 @@
     <div class="game-container">
         <div class="game-header">
             <div class="header-buttons">
-                <button class="header-btn" onclick="showBGMSelector()">🎵 BGM</button>
                 <button class="header-btn" onclick="showClues()">📋 단서</button>
             </div>
             <h1 style="cursor: pointer;" onclick="window.location.href='../../'">🔍 호건이를 찾아서</h1>
@@ -832,7 +831,7 @@
         };
 
         // 스토리 로드 (버전 파라미터로 캐시 우회)
-        fetch('story.json?v=3.24')
+        fetch('story.json?v=3.25')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('story.json을 찾을 수 없습니다. 먼저 컴파일 해주세요.');
@@ -1411,6 +1410,7 @@ https://oringnam.github.io/hogeon-mystery/`;
         // BGM 선택 모달
         function showBGMSelector() {
             const modal = document.createElement('div');
+            modal.className = 'bgm-modal';
             modal.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -1437,62 +1437,100 @@ https://oringnam.github.io/hogeon-mystery/`;
             
             const tracks = AudioManager.tracks;
             const currentTrack = AudioManager.currentTrack;
+            const enabled = AudioManager.enabled;
             
-            let trackButtons = '';
+            // ON/OFF 토글 버튼
+            const toggleBtn = document.createElement('button');
+            toggleBtn.style.cssText = `
+                width: 100%;
+                padding: 16px;
+                margin-bottom: 16px;
+                background: ${enabled ? '#4CAF50' : '#f44336'};
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            `;
+            toggleBtn.textContent = enabled ? '🔊 BGM 켜짐' : '🔇 BGM 꺼짐';
+            toggleBtn.onclick = () => {
+                const newEnabled = AudioManager.toggle();
+                toggleBtn.textContent = newEnabled ? '🔊 BGM 켜짐' : '🔇 BGM 꺼짐';
+                toggleBtn.style.background = newEnabled ? '#4CAF50' : '#f44336';
+                
+                // 음소거 버튼 업데이트
+                const muteBtn = document.getElementById('muteBtn');
+                if (muteBtn) {
+                    muteBtn.innerHTML = newEnabled ? '🔊' : '🔇';
+                }
+            };
+            content.appendChild(toggleBtn);
+            
+            // 제목
+            const title = document.createElement('h3');
+            title.style.cssText = 'margin: 0 0 16px 0; color: #333;';
+            title.textContent = '🎵 곡 선택';
+            content.appendChild(title);
+            
+            // 트랙 버튼들
             Object.keys(tracks).forEach(key => {
                 const track = tracks[key];
                 const isActive = key === currentTrack;
-                trackButtons += `
-                    <button 
-                        onclick="selectBGM('${key}')"
-                        style="
-                            width: 100%;
-                            padding: 16px;
-                            margin-bottom: 12px;
-                            background: ${isActive ? '#667eea' : '#f0f0f0'};
-                            color: ${isActive ? 'white' : '#333'};
-                            border: ${isActive ? '2px solid #764ba2' : '2px solid transparent'};
-                            border-radius: 8px;
-                            font-size: 15px;
-                            font-weight: 600;
-                            cursor: pointer;
-                            text-align: left;
-                            transition: all 0.2s;
-                        "
-                        onmouseover="this.style.background='${isActive ? '#764ba2' : '#e0e0e0'}'"
-                        onmouseout="this.style.background='${isActive ? '#667eea' : '#f0f0f0'}'"
-                    >
-                        <div style="font-size: 16px; margin-bottom: 4px;">
-                            ${isActive ? '🎵 ' : ''}${track.name}
-                        </div>
-                        <div style="font-size: 13px; opacity: 0.8;">
-                            ${track.desc}
-                        </div>
-                    </button>
+                
+                const trackBtn = document.createElement('button');
+                trackBtn.style.cssText = `
+                    width: 100%;
+                    padding: 16px;
+                    margin-bottom: 12px;
+                    background: ${isActive ? '#667eea' : '#f0f0f0'};
+                    color: ${isActive ? 'white' : '#333'};
+                    border: ${isActive ? '2px solid #764ba2' : '2px solid transparent'};
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    text-align: left;
+                    transition: all 0.2s;
                 `;
+                trackBtn.innerHTML = `
+                    <div style="font-size: 16px; margin-bottom: 4px;">
+                        ${isActive ? '🎵 ' : ''}${track.name}
+                    </div>
+                    <div style="font-size: 13px; opacity: 0.8;">
+                        ${track.desc}
+                    </div>
+                `;
+                trackBtn.onclick = () => selectBGM(key);
+                trackBtn.onmouseover = () => {
+                    trackBtn.style.background = isActive ? '#764ba2' : '#e0e0e0';
+                };
+                trackBtn.onmouseout = () => {
+                    trackBtn.style.background = isActive ? '#667eea' : '#f0f0f0';
+                };
+                content.appendChild(trackBtn);
             });
             
-            content.innerHTML = `
-                <h3 style="margin: 0 0 16px 0; color: #333;">🎵 배경음악 선택</h3>
-                ${trackButtons}
-                <button 
-                    onclick="this.closest('[style*=\"position: fixed\"]').remove()"
-                    style="
-                        width: 100%;
-                        padding: 12px;
-                        background: #e0e0e0;
-                        color: #333;
-                        border: none;
-                        border-radius: 8px;
-                        font-size: 15px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        margin-top: 8px;
-                    "
-                >
-                    닫기
-                </button>
+            // 닫기 버튼
+            const closeBtn = document.createElement('button');
+            closeBtn.style.cssText = `
+                width: 100%;
+                padding: 12px;
+                background: #e0e0e0;
+                color: #333;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 8px;
             `;
+            closeBtn.textContent = '닫기';
+            closeBtn.onclick = () => {
+                modal.remove();
+            };
+            content.appendChild(closeBtn);
             
             modal.appendChild(content);
             document.body.appendChild(modal);
@@ -1509,10 +1547,15 @@ https://oringnam.github.io/hogeon-mystery/`;
         function selectBGM(trackKey) {
             AudioManager.changeTrack(trackKey);
             // 모달 닫기
-            const modal = document.querySelector('[style*="position: fixed"]');
+            const modal = document.querySelector('.bgm-modal');
             if (modal) modal.remove();
             // 알림
             showNotification(`🎵 ${AudioManager.tracks[trackKey].name} 재생 중`);
+            // 음소거 버튼 업데이트
+            const muteBtn = document.getElementById('muteBtn');
+            if (muteBtn) {
+                muteBtn.innerHTML = AudioManager.enabled ? '🔊' : '🔇';
+            }
         }
 
         // Service Worker 등록 (캐싱으로 빠른 재방문)
@@ -1524,16 +1567,14 @@ https://oringnam.github.io/hogeon-mystery/`;
 
         // 🔊 음소거 버튼 + ⌨️ 타이핑 스킵 (페이지 로드 후)
         document.addEventListener('DOMContentLoaded', () => {
-            // 음소거 버튼
+            // 음소거 버튼 → BGM 선택 버튼으로 변경
             const muteBtn = document.createElement('button');
             muteBtn.id = 'muteBtn';
             muteBtn.className = 'mute-btn';
             muteBtn.innerHTML = AudioManager.enabled ? '🔊' : '🔇';
-            muteBtn.title = AudioManager.enabled ? 'BGM 끄기' : 'BGM 켜기';
+            muteBtn.title = 'BGM 선택';
             muteBtn.onclick = () => {
-                const enabled = AudioManager.toggle();
-                muteBtn.innerHTML = enabled ? '🔊' : '🔇';
-                muteBtn.title = enabled ? 'BGM 끄기' : 'BGM 켜기';
+                showBGMSelector();
             };
             document.body.appendChild(muteBtn);
             
