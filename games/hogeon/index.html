@@ -721,7 +721,7 @@
         // ⌨️ Typewriter Effect Manager
         const TypewriterManager = {
             enabled: true,
-            speed: 35, // ms per character (50→35 faster)
+            speed: 25, // ms per character (35→25 faster)
             currentTyping: null,
             currentElement: null,
             isTyping: false,
@@ -860,6 +860,7 @@
         function continueStory() {
             // 연속된 텍스트를 하나의 블록으로 묶기
             let currentBlock = null;
+            let pendingImages = []; // 이미지를 나중에 렌더링
             
             while (story.canContinue) {
                 const line = story.Continue();
@@ -874,7 +875,8 @@
                         }
                         if (tag.startsWith('IMAGE:')) {
                             const filename = tag.replace('IMAGE:', '').trim();
-                            renderImage(filename);
+                            // 즉시 렌더링하지 않고 저장
+                            pendingImages.push(filename);
                             currentBlock = null; // 이미지 후 새 블록 시작
                         }
                         if (tag.startsWith('MUSIC:')) {
@@ -951,8 +953,15 @@
                                 typeNext();
                             });
                         } else {
-                            // 모든 타이핑 완료 후 선택지 표시
+                            // 모든 타이핑 완료 후 이미지 렌더링 + 선택지 표시
                             storyContainer.classList.remove('typing');
+                            
+                            // 대기 중인 이미지 렌더링
+                            pendingImages.forEach(filename => {
+                                renderImage(filename);
+                            });
+                            pendingImages = []; // 초기화
+                            
                             scrollToBottom(); // 모든 타이핑 완료 후 1회만 스크롤
                             showChoices();
                         }
@@ -963,13 +972,32 @@
                 }
             }
             
-            // 타이핑 효과 없으면 바로 선택지 표시
+            // 타이핑 효과 없으면 이미지 렌더링 + 선택지 표시
+            pendingImages.forEach(filename => {
+                renderImage(filename);
+            });
+            pendingImages = []; // 초기화
+            
             scrollToBottom();
             showChoices();
         }
 
         function showChoices() {
             const choices = story.currentChoices;
+            
+            // 엔딩이 감지되었으면 무조건 "엔딩 보기"만 표시
+            if (currentEnding) {
+                choicesContainer.style.display = 'block';
+                choicesContainer.innerHTML = '';
+                const endingButton = document.createElement('button');
+                endingButton.className = 'choice-button';
+                endingButton.textContent = '🏁 엔딩 보기';
+                endingButton.onclick = () => showEndingModal();
+                choicesContainer.appendChild(endingButton);
+                updateProgress();
+                scrollToBottom();
+                return;
+            }
             
             if (choices.length > 0) {
                 choicesContainer.style.display = 'block';
@@ -985,6 +1013,7 @@
             } else {
                 // 스토리 끝 - 엔딩 선택지 표시
                 choicesContainer.style.display = 'block';
+                choicesContainer.innerHTML = '';
                 const endingButton = document.createElement('button');
                 endingButton.className = 'choice-button';
                 endingButton.textContent = '🏁 엔딩 보기';
