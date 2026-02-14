@@ -518,6 +518,28 @@
             transform: scale(0.95);
         }
 
+        .type-btn {
+            bottom: 80px !important;
+        }
+
+        /* 타이핑 효과 - 커서 깜빡임 */
+        .story-block p[data-typewriter]::after {
+            content: '▋';
+            animation: blink 1s infinite;
+            opacity: 0.7;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 0.7; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* 타이핑 중 클릭 힌트 */
+        .story-container.typing {
+            cursor: pointer;
+        }
+
         /* 모바일 최적화 */
         @media (max-width: 600px) {
             .game-header h1 { font-size: 1.3em; }
@@ -533,6 +555,9 @@
                 height: 45px;
                 font-size: 20px;
             }
+            .type-btn {
+                bottom: 70px !important;
+            }
         }
     </style>
 </head>
@@ -544,7 +569,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.18 (2026-02-14 19:30 KST) - BGM Added 🎵</div>
+            <div class="version-info">v3.19 (2026-02-14 19:50 KST) - Typewriter Effect ⌨️</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -662,6 +687,83 @@
             AudioManager.enabled = savedBgmState === 'true';
         }
 
+        // ⌨️ Typewriter Effect Manager
+        const TypewriterManager = {
+            enabled: true,
+            speed: 30, // ms per character
+            currentTyping: null,
+            isTyping: false,
+            queue: [],
+            
+            typeText(element, text, callback) {
+                if (!this.enabled) {
+                    element.innerHTML = text;
+                    if (callback) callback();
+                    return;
+                }
+                
+                this.isTyping = true;
+                let index = 0;
+                element.innerHTML = '';
+                
+                const type = () => {
+                    if (index < text.length) {
+                        element.innerHTML += text[index];
+                        index++;
+                        this.currentTyping = setTimeout(type, this.speed);
+                    } else {
+                        this.isTyping = false;
+                        this.currentTyping = null;
+                        if (callback) callback();
+                    }
+                };
+                
+                type();
+            },
+            
+            skip() {
+                if (this.currentTyping) {
+                    clearTimeout(this.currentTyping);
+                    this.currentTyping = null;
+                    this.isTyping = false;
+                }
+            },
+            
+            skipAll() {
+                this.skip();
+                // 큐에 있는 모든 타이핑 즉시 완료
+                this.queue.forEach(item => {
+                    if (item.element && item.text) {
+                        item.element.innerHTML = item.text;
+                    }
+                });
+                this.queue = [];
+                this.isTyping = false;
+            },
+            
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('typewriter_enabled', this.enabled);
+                console.log(`⌨️ Typewriter ${this.enabled ? 'enabled' : 'disabled'}`);
+                return this.enabled;
+            },
+            
+            setSpeed(speed) {
+                this.speed = speed;
+                localStorage.setItem('typewriter_speed', speed);
+            }
+        };
+
+        // 로컬 스토리지에서 타이핑 설정 복원
+        const savedTypewriterState = localStorage.getItem('typewriter_enabled');
+        if (savedTypewriterState !== null) {
+            TypewriterManager.enabled = savedTypewriterState === 'true';
+        }
+        const savedTypewriterSpeed = localStorage.getItem('typewriter_speed');
+        if (savedTypewriterSpeed !== null) {
+            TypewriterManager.speed = parseInt(savedTypewriterSpeed);
+        }
+
         // 단서 정보 맵
         const clueInfo = {
             'clue_lotto': { name: '로또 당첨', desc: '동대문구에서 1등 당첨 기록 발견' },
@@ -689,7 +791,7 @@
         };
 
         // 스토리 로드 (버전 파라미터로 캐시 우회)
-        fetch('story.json?v=3.18')
+        fetch('story.json?v=3.19')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('story.json을 찾을 수 없습니다. 먼저 컴파일 해주세요.');
@@ -774,16 +876,60 @@
                         const p = document.createElement('p');
                         // 볼드 처리 (**text**)
                         let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        p.innerHTML = formattedLine;
+                        
+                        // 타이핑 효과를 위해 data 속성 저장
+                        if (TypewriterManager.enabled) {
+                            p.setAttribute('data-typewriter', formattedLine);
+                            p.innerHTML = ''; // 빈 상태로 시작
+                        } else {
+                            p.innerHTML = formattedLine;
+                        }
                         currentBlock.appendChild(p);
                     }
                 }
             }
 
-            // 자동 스크롤 (tail로)
+            // 타이핑 효과 적용
+            if (TypewriterManager.enabled) {
+                // 타이핑할 요소들 수집
+                const typewriterElements = Array.from(storyContainer.querySelectorAll('[data-typewriter]'));
+                
+                if (typewriterElements.length > 0) {
+                    // 선택지 숨기기 (타이핑 중)
+                    choicesContainer.style.display = 'none';
+                    storyContainer.classList.add('typing');
+                    
+                    // 순차적으로 타이핑
+                    let index = 0;
+                    const typeNext = () => {
+                        if (index < typewriterElements.length) {
+                            const element = typewriterElements[index];
+                            const text = element.getAttribute('data-typewriter');
+                            element.removeAttribute('data-typewriter'); // 한 번만 타이핑
+                            
+                            TypewriterManager.typeText(element, text, () => {
+                                index++;
+                                scrollToBottom();
+                                typeNext();
+                            });
+                        } else {
+                            // 모든 타이핑 완료 후 선택지 표시
+                            storyContainer.classList.remove('typing');
+                            showChoices();
+                        }
+                    };
+                    
+                    typeNext();
+                    return; // 여기서 종료, showChoices()에서 나머지 처리
+                }
+            }
+            
+            // 타이핑 효과 없으면 바로 선택지 표시
             scrollToBottom();
+            showChoices();
+        }
 
-            // 선택지 출력
+        function showChoices() {
             const choices = story.currentChoices;
             
             if (choices.length > 0) {
@@ -809,6 +955,7 @@
 
             // 진행도 업데이트
             updateProgress();
+            scrollToBottom();
         }
 
         function renderImage(filename) {
@@ -1228,8 +1375,9 @@ https://oringnam.github.io/hogeon-mystery/`;
                 .catch(err => console.log('Service Worker 등록 실패:', err));
         }
 
-        // 🔊 음소거 버튼 추가 (페이지 로드 후)
+        // 🔊 음소거 버튼 + ⌨️ 타이핑 스킵 (페이지 로드 후)
         document.addEventListener('DOMContentLoaded', () => {
+            // 음소거 버튼
             const muteBtn = document.createElement('button');
             muteBtn.id = 'muteBtn';
             muteBtn.className = 'mute-btn';
@@ -1241,6 +1389,43 @@ https://oringnam.github.io/hogeon-mystery/`;
                 muteBtn.title = enabled ? 'BGM 끄기' : 'BGM 켜기';
             };
             document.body.appendChild(muteBtn);
+            
+            // 타이핑 효과 토글 버튼
+            const typeBtn = document.createElement('button');
+            typeBtn.className = 'mute-btn type-btn';
+            typeBtn.innerHTML = TypewriterManager.enabled ? '⌨️' : '⚡';
+            typeBtn.title = TypewriterManager.enabled ? '타이핑 효과 끄기 (빠르게)' : '타이핑 효과 켜기';
+            typeBtn.onclick = () => {
+                const enabled = TypewriterManager.toggle();
+                typeBtn.innerHTML = enabled ? '⌨️' : '⚡';
+                typeBtn.title = enabled ? '타이핑 효과 끄기 (빠르게)' : '타이핑 효과 켜기';
+            };
+            document.body.appendChild(typeBtn);
+            
+            // 타이핑 스킵 (화면 클릭/탭)
+            storyContainer.addEventListener('click', (e) => {
+                // 선택지 버튼 클릭은 무시
+                if (e.target.classList.contains('choice-button')) return;
+                
+                if (TypewriterManager.isTyping) {
+                    // 현재 타이핑 중이면 즉시 완료
+                    TypewriterManager.skip();
+                    
+                    // 남은 모든 텍스트 즉시 표시
+                    const remaining = storyContainer.querySelectorAll('[data-typewriter]');
+                    remaining.forEach(el => {
+                        const text = el.getAttribute('data-typewriter');
+                        el.innerHTML = text;
+                        el.removeAttribute('data-typewriter');
+                    });
+                    
+                    // 타이핑 클래스 제거
+                    storyContainer.classList.remove('typing');
+                    
+                    // 선택지 바로 표시
+                    showChoices();
+                }
+            });
         });
     </script>
 </body>
