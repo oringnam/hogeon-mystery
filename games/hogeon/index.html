@@ -507,7 +507,7 @@
             </div>
             <h1>🔍 호건이를 찾아서</h1>
             <p>9년 만의 미스터리를 풀어보세요</p>
-            <div class="version-info">v3.12 (2026-02-14 17:00 KST) - Cache Bust Fix</div>
+            <div class="version-info">v3.13 (2026-02-14 17:02 KST) - Share Modal Fix</div>
             <div class="progress-bar">
                 <div class="progress-indicator" id="progressIndicator">
                     조사 시작 전
@@ -602,7 +602,7 @@
         };
 
         // 스토리 로드 (버전 파라미터로 캐시 우회)
-        fetch('story.json?v=3.11')
+        fetch('story.json?v=3.13')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('story.json을 찾을 수 없습니다. 먼저 컴파일 해주세요.');
@@ -817,12 +817,13 @@
         }
 
         function shareEnding() {
-            console.log('shareEnding called'); // DEBUG
-            
-            const endingData = endings[currentEnding] || endings.ship;
-            const collectedEndings = getCollectedEndings().length;
-            
-            const shareText = `🔍 호건이를 찾아서
+            try {
+                console.log('shareEnding called'); // DEBUG
+                
+                const endingData = endings[currentEnding] || endings.ship;
+                const collectedEndings = getCollectedEndings().length;
+                
+                const shareText = `🔍 호건이를 찾아서
 
 ${endingData.emoji} ${endingData.title}
 
@@ -831,10 +832,28 @@ ${endingData.emoji} ${endingData.title}
 
 https://oringnam.github.io/hogeon-mystery/`;
 
-            console.log('Share text prepared:', shareText); // DEBUG
-            
-            // Direct clipboard copy (most reliable for KakaoTalk sharing)
-            copyTextToClipboard(shareText);
+                console.log('Share text prepared:', shareText); // DEBUG
+                
+                // 무조건 모달 표시 (가장 확실한 방법)
+                showShareTextModal(shareText);
+                
+                // 백그라운드에서 클립보드 복사 시도
+                copyTextToClipboardSilent(shareText);
+            } catch (err) {
+                console.error('shareEnding error:', err);
+                alert('공유 기능 오류: ' + err.message);
+            }
+        }
+        
+        function copyTextToClipboardSilent(text) {
+            // 조용히 클립보드 복사 시도 (에러 무시)
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).catch(() => {});
+                }
+            } catch (e) {
+                // 무시
+            }
         }
         
         function showNotification(message) {
@@ -848,71 +867,8 @@ https://oringnam.github.io/hogeon-mystery/`;
             }
         }
 
-        function copyTextToClipboard(text) {
-            console.log('copyTextToClipboard called with text:', text); // DEBUG
-            
-            // Method 1: Modern Clipboard API
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                console.log('Trying Clipboard API'); // DEBUG
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        console.log('Clipboard API SUCCESS'); // DEBUG
-                        showNotification('✅ 복사 완료! 카톡에 붙여넣기 하세요');
-                    })
-                    .catch((err) => {
-                        console.log('Clipboard API failed:', err); // DEBUG
-                        // Fallback to textarea method
-                        copyViaTextarea(text);
-                    });
-                return;
-            }
-            
-            // Method 2: Fallback - textarea + execCommand
-            console.log('Clipboard API not available, using textarea'); // DEBUG
-            copyViaTextarea(text);
-        }
-        
-        function copyViaTextarea(text) {
-            console.log('copyViaTextarea called'); // DEBUG
-            
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            
-            // Make it visible but off-screen for mobile
-            textarea.style.position = 'fixed';
-            textarea.style.top = '0';
-            textarea.style.left = '0';
-            textarea.style.width = '100%';
-            textarea.style.height = '100px';
-            textarea.style.fontSize = '16px'; // Prevent zoom on iOS
-            textarea.setAttribute('readonly', '');
-            
-            document.body.appendChild(textarea);
-            
-            // Focus and select
-            textarea.focus();
-            textarea.select();
-            
-            // For iOS
-            textarea.setSelectionRange(0, 99999);
-            
-            try {
-                const success = document.execCommand('copy');
-                console.log('execCommand result:', success); // DEBUG
-                
-                if (success) {
-                    showNotification('✅ 복사 완료! 카톡에 붙여넣기 하세요');
-                } else {
-                    // Last resort: show manual copy modal
-                    showShareTextModal(text);
-                }
-            } catch (err) {
-                console.log('execCommand error:', err); // DEBUG
-                showShareTextModal(text);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
+        // 이 함수들은 더 이상 사용 안 함 (주석 처리)
+        // shareEnding()에서 직접 모달 표시
         
         function showShareTextModal(text) {
             console.log('Showing manual copy modal'); // DEBUG
@@ -965,7 +921,7 @@ https://oringnam.github.io/hogeon-mystery/`;
                 >${text}</textarea>
                 <div style="margin-top: 16px; display: flex; gap: 8px;">
                     <button 
-                        onclick="document.getElementById('shareTextArea').select(); document.execCommand('copy'); this.textContent='✅ 복사됨!'"
+                        id="copyButtonInModal"
                         style="
                             flex: 1;
                             padding: 12px;
@@ -981,7 +937,7 @@ https://oringnam.github.io/hogeon-mystery/`;
                         📋 복사하기
                     </button>
                     <button 
-                        onclick="this.closest('div').parentElement.parentElement.remove()"
+                        id="closeModalButton"
                         style="
                             flex: 1;
                             padding: 12px;
@@ -1001,6 +957,47 @@ https://oringnam.github.io/hogeon-mystery/`;
             
             modal.appendChild(content);
             document.body.appendChild(modal);
+            
+            // 복사 버튼 이벤트
+            document.getElementById('copyButtonInModal').addEventListener('click', function() {
+                const textarea = document.getElementById('shareTextArea');
+                textarea.select();
+                textarea.setSelectionRange(0, 99999); // For mobile
+                
+                try {
+                    // Try clipboard API first
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            this.textContent = '✅ 복사 완료!';
+                            this.style.background = '#4CAF50';
+                        }).catch(() => {
+                            // Fallback to execCommand
+                            const success = document.execCommand('copy');
+                            if (success) {
+                                this.textContent = '✅ 복사 완료!';
+                                this.style.background = '#4CAF50';
+                            }
+                        });
+                    } else {
+                        // Use execCommand directly
+                        const success = document.execCommand('copy');
+                        if (success) {
+                            this.textContent = '✅ 복사 완료!';
+                            this.style.background = '#4CAF50';
+                        } else {
+                            this.textContent = '❌ 실패 - 길게 눌러 복사';
+                        }
+                    }
+                } catch (err) {
+                    console.error('Copy error:', err);
+                    this.textContent = '❌ 실패 - 길게 눌러 복사';
+                }
+            });
+            
+            // 닫기 버튼 이벤트
+            document.getElementById('closeModalButton').addEventListener('click', function() {
+                modal.remove();
+            });
             
             // Auto-focus and select
             setTimeout(() => {
