@@ -1,6 +1,9 @@
 # Compiler binary (플랫폼별로 다름)
 tools/inklecate
 
+# Local/reference photos (do not commit real photos)
+reference-photos/
+
 # macOS
 .DS_Store
 
