@@ -29,6 +29,11 @@ VAR checked_records = false
 VAR current_path = ""
 VAR came_from = ""
 
+// 5단계 분기 추적
+VAR digital_clue = ""
+VAR family_clue = ""
+VAR records_clue = ""
+
 // 상태 리스트 (세부 분기 추적)
 LIST investigation_state = none
 LIST sns_path = sns_none, sns_lotto, sns_fantasy, sns_fitness
@@ -40,39 +45,14 @@ LIST records_path = rec_none, rec_witness, rec_defendant, rec_lotto, rec_busines
 // INCLUDE 모듈
 // ========================================
 
+// Core
 INCLUDE core/prologue.ink
-INCLUDE core/investigation_hub.ink
-INCLUDE core/analysis.ink
 INCLUDE core/epilogue.ink
 
-INCLUDE branches/sns/sns_hub.ink
-INCLUDE branches/sns/sns_lotto.ink
-INCLUDE branches/sns/sns_fantasy.ink
-INCLUDE branches/sns/sns_fitness.ink
-
-INCLUDE branches/family/family_hub.ink
-INCLUDE branches/family/family_money.ink
-INCLUDE branches/family/family_ship.ink
-INCLUDE branches/family/family_hospital.ink
-
-INCLUDE branches/university/university_hub.ink
-INCLUDE branches/university/uni_dropout.ink
-INCLUDE branches/university/uni_infosec.ink
-INCLUDE branches/university/uni_religion.ink
-
-INCLUDE branches/records/records_hub.ink
-INCLUDE branches/records/rec_witness.ink
-INCLUDE branches/records/rec_defendant.ink
-INCLUDE branches/records/rec_lotto.ink
-INCLUDE branches/records/rec_business.ink
-
-INCLUDE branches/deeper/deeper_hub.ink
-INCLUDE branches/deeper/busan_ship.ink
-INCLUDE branches/deeper/hospital_visit.ink
-INCLUDE branches/deeper/police_inquiry.ink
-INCLUDE branches/deeper/temple_search.ink
-INCLUDE branches/deeper/prison_check.ink
-INCLUDE branches/deeper/business_trace.ink
+// 3 Main Paths (5-stage branching)
+INCLUDE paths/digital_path.ink
+INCLUDE paths/family_path.ink
+INCLUDE paths/records_path.ink
 
 INCLUDE endings/auto_deduction.ink
 INCLUDE endings/lotto.ink

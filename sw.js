@@ -1,5 +1,5 @@
 // Service Worker - 캐싱으로 빠른 로딩
-const CACHE_NAME = 'hogeon-mystery-v36';
+const CACHE_NAME = 'hogeon-mystery-v40';
 const urlsToCache = [
   '/',
   '/index.html',
