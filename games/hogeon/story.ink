@@ -132,9 +132,23 @@ VAR checked_records = false
     -> analysis_phase
 }
 
-친구들이 각자 떠올린 아이디어를 나눴다.
+// 맥락 연결 (조사 후 멘트)
+{ investigation_depth == 1:
+    "일단 하나 확인했다. 더 알아보자."
+}
+{ investigation_depth == 2:
+    "단서가 쌓이고 있어. 계속 파보자."
+}
+{ investigation_depth == 3:
+    "점점 윤곽이 잡히는 것 같은데... 더 조사해야 할 것 같아."
+}
+{ investigation_depth >= 4:
+    "많이 알아냈네. 조금만 더 파보자."
+}
 
-"뭐부터 볼까?"
+친구들이 다시 모여 다음 행동을 논의했다.
+
+"다음은 뭘 해볼까?"
 
 * {not checked_sns} [SNS 계정 확인하기]
     -> check_sns
