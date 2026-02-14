@@ -594,7 +594,7 @@
                 <div class="ending-description" id="endingDescription">
                     호건이를 찾는 여정이 끝났습니다.
                 </div>
-                <div class="ending-stats" id="endingStats"></div>
+                <!-- ending stats removed -->
                 <div class="ending-actions">
                     <button class="btn btn-primary" onclick="shareEnding()">
                         📤 공유하기
@@ -1074,9 +1074,7 @@
             return '🖼️';
         }
 
-        function getCollectedEndings() {
-            return JSON.parse(localStorage.getItem('hogeon_endings') || '[]');
-        }
+        // (엔딩 수집/진행률 표시 기능 제거)
 
         function detectEnding(headerText) {
             // "엔딩 1: 로또 당첨" 같은 형식에서 타입 추출
@@ -1094,47 +1092,11 @@
         function showEndingModal() {
             const modal = document.getElementById('endingModal');
             const endingData = endings[currentEnding] || endings.ship; // fallback
-            
-            // 엔딩 수집 (로컬스토리지)
-            let collectedEndings = getCollectedEndings();
-            if (currentEnding && !collectedEndings.includes(currentEnding)) {
-                collectedEndings.push(currentEnding);
-                localStorage.setItem('hogeon_endings', JSON.stringify(collectedEndings));
-            }
-            
-            const endingCount = collectedEndings.length;
-            const isNewEnding = currentEnding && collectedEndings[collectedEndings.length - 1] === currentEnding;
-            
+
             document.getElementById('endingImage').textContent = endingData.emoji;
             document.getElementById('endingTitle').textContent = endingData.title;
-            
-            let description = endingData.desc;
-            if (isNewEnding && endingCount > 1) {
-                description += `\n\n✨ 새로운 엔딩 발견! (${endingCount}/9)`;
-            } else if (endingCount === 9) {
-                description += '\n\n🎉 모든 엔딩을 수집했습니다!';
-            } else {
-                description += `\n\n수집한 엔딩: ${endingCount}/9`;
-            }
-            
-            document.getElementById('endingDescription').textContent = description;
-            
-            // 통계 정보 표시
-            const statsHTML = `
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <div>
-                        <div style="font-size: 1.5em; font-weight: bold; color: #667eea;">${endingCount}</div>
-                        <div style="font-size: 0.85em;">수집한 엔딩</div>
-                    </div>
-                    <div style="border-left: 1px solid #ddd;"></div>
-                    <div>
-                        <div style="font-size: 1.5em; font-weight: bold; color: #764ba2;">9</div>
-                        <div style="font-size: 0.85em;">전체 엔딩</div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('endingStats').innerHTML = statsHTML;
-            
+            document.getElementById('endingDescription').textContent = endingData.desc;
+
             modal.classList.add('show');
         }
 
@@ -1143,13 +1105,11 @@
                 console.log('shareEnding called'); // DEBUG
                 
                 const endingData = endings[currentEnding] || endings.ship;
-                const collectedEndings = getCollectedEndings().length;
-                
+
                 const shareText = `🔍 호건이를 찾아서
 
 ${endingData.emoji} ${endingData.title}
 
-나는 ${collectedEndings}/9개 엔딩을 수집했어!
 너도 호건이를 찾아봐!
 
 https://oringnam.github.io/hogeon-mystery/`;

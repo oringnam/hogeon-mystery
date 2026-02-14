@@ -1,5 +1,5 @@
 // Service Worker - 캐싱으로 빠른 로딩 + 업데이트 안정화(모바일 대응)
-const CACHE_NAME = 'hogeon-mystery-v48';
+const CACHE_NAME = 'hogeon-mystery-v49';
 
 // NOTE: GitHub Pages에서는 쿼리스트링이 붙어도 동일 리소스를 서빙함
 //       (story.json?v=...) 형태를 함께 캐싱하면, 모바일에서 구버전 고착을 줄일 수 있음
