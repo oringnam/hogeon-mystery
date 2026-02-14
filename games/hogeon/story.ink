@@ -406,31 +406,31 @@ VAR checked_records = false
 
 각자가 추론한 가능성들:
 
-* {clue_lotto} [로또 당첨으로 잠적]
+* {clue_lotto} ["돈 때문이었을까?"]
     -> ending_lotto
 
-* {clue_ship} [원양어선에 취직]
+* {clue_ship} ["바다로 떠났을까?"]
     -> ending_ship
 
-* {clue_witness} [증인보호프로그램]
+* {clue_witness} ["누군가에게 쫓기고 있을까?"]
     -> ending_witness
 
-* {clue_hospital} [교통사고 후 코마 상태]
+* {clue_hospital} ["사고를 당했을까?"]
     -> ending_coma
 
-* {clue_fantasy} [이세계 전이... 농담이겠지]
+* {clue_fantasy} ["정말로... 사라진 걸까?"]
     -> ending_fantasy
 
-* {clue_spy} [국정원 스카우트]
+* {clue_spy} ["국가를 위해 일하고 있을까?"]
     -> ending_spy
 
-* {clue_religion} [종교 입문]
+* {clue_religion} ["마음의 평화를 찾았을까?"]
     -> ending_religion
 
-* {clue_business} [사업 실패 후 도피]
+* {clue_business} ["빚 때문에 숨었을까?"]
     -> ending_business
 
-+ [더 조사가 필요하다]
++ ["더 조사가 필요해"]
     "아직 확실하지 않아. 더 파보자."
     -> deeper_investigation
 
@@ -444,7 +444,7 @@ VAR checked_records = false
 
 "직접 발로 뛰어보자."
 
-* [부산 선박회사 방문]
+* [부산으로 가보자]
     정호와 의진이 부산으로 내려갔다.
     
     선박회사 인사팀에서 확인한 결과...
@@ -459,7 +459,7 @@ VAR checked_records = false
     
     -> ending_ship
 
-* [서울대병원 직접 방문]
+* [병원 기록을 확인하자]
     범환과 진원이 병원을 찾았다.
     
     보호자 확인 후 면회실로 안내되었다.
@@ -474,7 +474,7 @@ VAR checked_records = false
     
     -> ending_coma
 
-* [부산 경찰서 방문]
+* [경찰에 문의하자]
     현식과 형준이 경찰서를 찾았다.
     
     형사가 조심스럽게 말했다.
@@ -489,7 +489,7 @@ VAR checked_records = false
     
     -> ending_witness
 
-* [절/교회 수소문]
+* [종교 시설을 알아보자]
     효배와 재원이 동국대 주변 종교 시설을 돌았다.
     
     한 스님이 기억했다.
