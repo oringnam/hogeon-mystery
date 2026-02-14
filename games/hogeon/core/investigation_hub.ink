@@ -74,27 +74,27 @@
     ~ came_from = "hub"
     -> records_hub
 
-// 심화 조사 (2단계 이상)
-* {investigation_depth >= 2 and not clue_ship} [부산 선박회사 조사]
+// 심화 조사 (1단계 이상 - 조건 완화)
+* {investigation_depth >= 1 and not clue_ship} [부산 선박회사 조사]
     ~ came_from = "hub"
     -> busan_ship_investigation
 
-* {investigation_depth >= 2 and not clue_hospital} [병원 기록 확인]
+* {investigation_depth >= 1 and not clue_hospital} [병원 기록 확인]
     ~ came_from = "hub"
     -> hospital_visit
 
-* {investigation_depth >= 2 and not clue_witness} [경찰 문의]
+* {investigation_depth >= 1 and not clue_witness} [경찰 문의]
     ~ came_from = "hub"
     -> police_inquiry
 
-* {investigation_depth >= 2 and not clue_religion} [종교 시설 조사]
+* {investigation_depth >= 1 and not clue_religion} [종교 시설 조사]
     ~ came_from = "hub"
     -> temple_search
 
-* {investigation_depth >= 2 and not clue_prison} [교정시설 확인]
+* {investigation_depth >= 1 and not clue_prison} [교정시설 확인]
     ~ came_from = "hub"
     -> prison_check
 
-* {investigation_depth >= 2 and not clue_business} [사업 실패 추적]
+* {investigation_depth >= 1 and not clue_business} [사업 실패 추적]
     ~ came_from = "hub"
     -> business_trace
