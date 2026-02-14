@@ -487,37 +487,153 @@ VAR checked_records = false
 
 === final_deduction ===
 
+// 단서 개수 세기
+~ temp clue_count = 0
+{ clue_lotto:
+    ~ clue_count = clue_count + 1
+}
+{ clue_ship:
+    ~ clue_count = clue_count + 1
+}
+{ clue_witness:
+    ~ clue_count = clue_count + 1
+}
+{ clue_hospital:
+    ~ clue_count = clue_count + 1
+}
+{ clue_fantasy:
+    ~ clue_count = clue_count + 1
+}
+{ clue_spy:
+    ~ clue_count = clue_count + 1
+}
+{ clue_religion:
+    ~ clue_count = clue_count + 1
+}
+{ clue_business:
+    ~ clue_count = clue_count + 1
+}
+{ clue_prison:
+    ~ clue_count = clue_count + 1
+}
+
+// 단서가 1-2개면 자동 추론
+{ clue_count <= 2:
+    -> auto_deduction
+}
+
+// 단서가 3개 이상: 친구들이 토론하며 좁히기
 친구들이 수집한 단서를 종합했다.
 
-"각자 추론해본 가능성을 말해보자."
+"이 단서들을 보면..."
 
-// 디버깅: 수집한 단서 확인
-{clue_lotto: "- 로또 당첨 단서 있음"}
-{clue_ship: "- 원양어선 단서 있음"}
-{clue_witness: "- 증인보호 단서 있음"}
-{clue_hospital: "- 교통사고 단서 있음"}
-{clue_fantasy: "- 이세계 단서 있음"}
-{clue_spy: "- 국정원 단서 있음"}
-{clue_religion: "- 출가 단서 있음"}
-{clue_business: "- 사업 실패 단서 있음"}
-{clue_prison: "- 복역 중 단서 있음"}
+범환이 화이트보드를 보며 말했다. "여러 가능성이 있는데, 가장 가능성 높은 건..."
 
-침묵이 흘렀다.
-
-"어떻게 생각해?"
-
-+ {clue_lotto} ["돈 때문이었을까?"]
-    "로또 당첨 기록이 있었잖아."
++ {clue_lotto} ["로또 당첨 기록과 어머니 수술... 이게 답인 것 같아"]
+    진원이 단서들을 다시 펼쳤다.
     
-    친구들이 고개를 끄덕였다.
+    "로또 당첨 시기, 어머니 수술비, SNS 포스팅..."
+    
+    "모든 게 맞아떨어져."
+    
+    -> approach_lotto_ending
+
++ {clue_ship} ["부산 선박회사 기록... 바다로 간 거야"]
+    정호가 송금 기록을 가리켰다.
+    
+    "생활비 출처가 부산 선박회사였잖아."
+    
+    "원양어선이야."
+    
+    -> approach_ship_ending
+
++ {clue_witness} ["증인보호 프로그램... 숨어 있는 거야"]
+    형준이 법원 기록을 보여줬다.
+    
+    "증인 출석 이후 잠적..."
+    
+    "경찰에 다시 문의해보자."
+    
+    -> approach_witness_ending
+
++ {clue_hospital} ["교통사고 기록... 혹시 지금도..."]
+    범환이 침통한 표정으로 말했다.
+    
+    "2017년 사고 이후... 병원 기록이 계속 있어."
+    
+    "가봐야 할 것 같아."
+    
+    -> approach_coma_ending
+
++ {clue_fantasy} ["원룸의 이상한 흔적... 뭔가 있어"]
+    현식이 사진을 다시 펼쳤다.
+    
+    "이건 정상적인 이사가 아니야."
+    
+    "다시 가보자."
+    
+    -> approach_fantasy_ending
+
++ {clue_spy} ["국정원 채용 시기... 정보보안 수강..."]
+    현이 데이터를 정리했다.
+    
+    "모든 패턴이 국가기관 채용이랑 일치해."
+    
+    "기다려보자."
+    
+    -> approach_spy_ending
+
++ {clue_religion} ["출가 기록... 절로 간 거야"]
+    효배가 스님과의 대화를 떠올렸다.
+    
+    "2017년 출가..."
+    
+    "강원도 산사로 가보자."
+    
+    -> approach_religion_ending
+
++ {clue_business} ["사업 실패... 빚 때문에 숨은 거야"]
+    진원이 신용 기록을 확인했다.
+    
+    "1억 가까운 빚..."
+    
+    "어딘가 숨어 있을 거야."
+    
+    -> approach_business_ending
+
++ {clue_prison} ["법원 기록... 복역 중인 거야"]
+    범환이 교정시설 명단을 확인했다.
+    
+    "이름이 있어..."
+    
+    "면회 가자."
+    
+    -> approach_prison_ending
+
++ {investigation_depth >= 2} ["더 조사가 필요해"]
+    "아직 확실하지 않아. 더 파보자."
+    -> deeper_investigation
+
++ {investigation_depth < 2} ["단서가 부족해. 더 조사하자"]
+    "이 정도론 부족해. 제대로 파보자."
+    -> investigation_hub
+
+// ========================================
+// 자동 추론 (단서 1-2개)
+// ========================================
+
+=== auto_deduction ===
+
+친구들이 수집한 단서를 보며 고개를 끄덕였다.
+
+"이 단서를 보면..."
+
+{ clue_lotto:
+    "로또 당첨 기록이 있었잖아."
     
     "어머니 수술비가 필요했고, SNS에 '인생 역전'이라고 썼고..."
     
-    "그리고 동대문구에서 1등 당첨."
-    
     "시기도 딱 맞아."
-    
-    침묵이 흘렀다.
     
     "그럼... 호건이는 지금 어디 있을까?"
     
@@ -526,9 +642,10 @@ VAR checked_records = false
     "가보자."
     
     -> approach_lotto_ending
+}
 
-+ {clue_ship} ["바다로 떠났을까?"]
-    "부산 선박회사 기록을 봤어."
+{ clue_ship:
+    "부산 선박회사 기록..."
     
     "생활비도 거기서 보냈고."
     
@@ -539,14 +656,10 @@ VAR checked_records = false
     "기다려보자."
     
     -> approach_ship_ending
+}
 
-+ {clue_witness} ["누군가에게 쫓기고 있을까?"]
-    "증인보호 얘기가 나왔잖아."
-    "경찰서에 다시 문의해보자."
-    -> approach_witness_ending
-
-+ {clue_hospital} ["사고를 당했을까?"]
-    "병원 기록에 장기 입원이..."
+{ clue_hospital:
+    "병원 기록에 장기 입원..."
     
     "교통사고 기록도 있었고."
     
@@ -557,39 +670,55 @@ VAR checked_records = false
     "면회 가능하대."
     
     -> approach_coma_ending
+}
 
-+ {clue_fantasy} ["정말로... 사라진 걸까?"]
-    "원룸에서 이상한 흔적을..."
-    "다시 가보자."
+{ clue_witness:
+    "증인보호 프로그램..."
+    
+    "경찰서에 다시 문의해보자."
+    
+    -> approach_witness_ending
+}
+
+{ clue_fantasy:
+    "원룸에서 이상한 흔적..."
+    
+    "한 번 더 가보자."
+    
     -> approach_fantasy_ending
+}
 
-+ {clue_spy} ["국가를 위해 일하고 있을까?"]
-    "갑자기 체력 단련, 정보보안..."
+{ clue_spy:
+    "국정원 채용 시기랑 맞아떨어져."
+    
     "만약 국정원이라면... 연락이 올 때까지 기다려야 해."
+    
     -> approach_spy_ending
+}
 
-+ {clue_religion} ["마음의 평화를 찾았을까?"]
+{ clue_religion:
     "출가 기록이 있었어."
+    
     "강원도 산사로 가보자."
+    
     -> approach_religion_ending
+}
 
-+ {clue_business} ["빚 때문에 숨었을까?"]
+{ clue_business:
     "사업 실패, 엄청난 빚..."
+    
     "어디 숨어있을까... 찾아보자."
+    
     -> approach_business_ending
+}
 
-+ {clue_prison} ["과거의 잘못 때문일까?"]
+{ clue_prison:
     "법원 기록에 피고인으로..."
+    
     "교정시설에 가보자."
+    
     -> approach_prison_ending
-
-+ {investigation_depth >= 2} ["더 조사가 필요해"]
-    "아직 확실하지 않아. 더 파보자."
-    -> deeper_investigation
-
-+ {investigation_depth < 2} ["단서가 부족해. 더 조사하자"]
-    "이 정도론 부족해. 제대로 파보자."
-    -> investigation_hub
+}
 
 // ========================================
 // 심화 조사
