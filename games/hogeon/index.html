@@ -537,7 +537,7 @@
                 </div>
                 <div class="ending-stats" id="endingStats"></div>
                 <div class="ending-actions">
-                    <button class="btn btn-primary" onclick="copyEndingText()">
+                    <button class="btn btn-primary" onclick="shareEnding()">
                         📤 공유하기
                     </button>
                     <button class="btn btn-secondary" onclick="location.reload()">
@@ -816,7 +816,9 @@
             modal.classList.add('show');
         }
 
-        function copyEndingText() {
+        function shareEnding() {
+            console.log('shareEnding called'); // DEBUG
+            
             const endingData = endings[currentEnding] || endings.ship;
             const collectedEndings = getCollectedEndings().length;
             
@@ -829,44 +831,159 @@ ${endingData.emoji} ${endingData.title}
 
 https://oringnam.github.io/hogeon-mystery/`;
 
+            // Try Web Share API first (mobile native share)
+            if (navigator.share) {
+                console.log('Using Web Share API'); // DEBUG
+                navigator.share({
+                    title: '호건이를 찾아서',
+                    text: shareText
+                }).then(() => {
+                    console.log('Share successful'); // DEBUG
+                    showNotification('✅ 공유 완료!');
+                }).catch((err) => {
+                    console.log('Share failed:', err); // DEBUG
+                    // If user cancelled, don't show error
+                    if (err.name !== 'AbortError') {
+                        copyEndingText(); // Fallback to copy
+                    }
+                });
+                return;
+            }
+            
+            // Fallback to clipboard copy
+            console.log('Web Share not supported, using clipboard'); // DEBUG
+            copyEndingText();
+        }
+        
+        function showNotification(message) {
+            const notification = document.getElementById('copyNotification');
+            if (notification) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        function copyEndingText() {
+            console.log('copyEndingText called'); // DEBUG
+            
+            const endingData = endings[currentEnding] || endings.ship;
+            const collectedEndings = getCollectedEndings().length;
+            
+            const shareText = `🔍 호건이를 찾아서
+
+${endingData.emoji} ${endingData.title}
+
+나는 ${collectedEndings}/9개 엔딩을 수집했어!
+너도 호건이를 찾아봐!
+
+https://oringnam.github.io/hogeon-mystery/`;
+
+            console.log('Share text:', shareText); // DEBUG
+
             // Clipboard API fallback for mobile
             const copyToClipboard = (text) => {
+                console.log('Attempting clipboard copy...'); // DEBUG
+                
                 // Try modern clipboard API first
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+                    console.log('Using Clipboard API'); // DEBUG
+                    return navigator.clipboard.writeText(text)
+                        .then(() => {
+                            console.log('Clipboard API success'); // DEBUG
+                            return true;
+                        })
+                        .catch((err) => {
+                            console.log('Clipboard API failed:', err); // DEBUG
+                            return false;
+                        });
                 }
+                
+                console.log('Using fallback method'); // DEBUG
                 
                 // Fallback: create textarea and copy
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
                 textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.width = '2em';
+                textarea.style.height = '2em';
+                textarea.style.padding = '0';
+                textarea.style.border = 'none';
+                textarea.style.outline = 'none';
+                textarea.style.boxShadow = 'none';
+                textarea.style.background = 'transparent';
                 document.body.appendChild(textarea);
                 
                 try {
+                    textarea.focus();
                     textarea.select();
-                    textarea.setSelectionRange(0, 99999); // For mobile
+                    textarea.setSelectionRange(0, textarea.value.length); // For mobile
                     const success = document.execCommand('copy');
+                    console.log('execCommand copy result:', success); // DEBUG
                     document.body.removeChild(textarea);
                     return Promise.resolve(success);
                 } catch (err) {
+                    console.log('Fallback copy failed:', err); // DEBUG
                     document.body.removeChild(textarea);
                     return Promise.resolve(false);
                 }
             };
 
             copyToClipboard(shareText).then(success => {
-                const notification = document.getElementById('copyNotification');
+                console.log('Copy result:', success); // DEBUG
+                
                 if (success) {
-                    notification.textContent = '✅ 공유 텍스트가 복사되었습니다!';
+                    showNotification('✅ 공유 텍스트가 복사되었습니다!');
                 } else {
-                    notification.textContent = '❌ 복사 실패. 다시 시도해주세요.';
+                    // Last resort: show text in modal
+                    showShareTextModal(shareText);
                 }
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 2000);
             });
+        }
+        
+        function showShareTextModal(text) {
+            console.log('Showing text modal as last resort'); // DEBUG
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 500px;
+                width: 100%;
+            `;
+            
+            content.innerHTML = `
+                <h3 style="margin-top: 0;">📤 공유 텍스트</h3>
+                <p style="font-size: 12px; color: #666;">아래 텍스트를 길게 눌러서 복사하세요:</p>
+                <textarea readonly style="width: 100%; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">${text}</textarea>
+                <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; width: 100%;">닫기</button>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Auto-select text
+            const textarea = content.querySelector('textarea');
+            textarea.select();
         }
 
         function selectChoice(index, choiceText) {
