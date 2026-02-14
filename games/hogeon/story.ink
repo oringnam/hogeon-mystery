@@ -143,7 +143,7 @@ VAR checked_records = false
 * {not checked_records} [공공 기록 검색하기]
     -> check_public_records
 
-* {investigation_depth >= 2} [모은 단서 분석하기]
++ {investigation_depth >= 1} [모은 단서 분석하기]
     -> analysis_phase
 
 // ========================================
@@ -406,31 +406,31 @@ VAR checked_records = false
 
 각자가 추론한 가능성들:
 
-* {clue_lotto and not clue_hospital and not clue_ship} [로또 당첨으로 잠적]
+* {clue_lotto} [로또 당첨으로 잠적]
     -> ending_lotto
 
-* {clue_ship and not clue_lotto} [원양어선에 취직]
+* {clue_ship} [원양어선에 취직]
     -> ending_ship
 
-* {clue_witness and checked_records} [증인보호프로그램]
+* {clue_witness} [증인보호프로그램]
     -> ending_witness
 
 * {clue_hospital} [교통사고 후 코마 상태]
     -> ending_coma
 
-* {clue_fantasy and checked_sns} [이세계 전이... 농담이겠지]
+* {clue_fantasy} [이세계 전이... 농담이겠지]
     -> ending_fantasy
 
-* {clue_spy and visited_university} [국정원 스카우트]
+* {clue_spy} [국정원 스카우트]
     -> ending_spy
 
 * {clue_religion} [종교 입문]
     -> ending_religion
 
-* {clue_business and not clue_lotto} [사업 실패 후 도피]
+* {clue_business} [사업 실패 후 도피]
     -> ending_business
 
-* [더 조사가 필요하다]
++ [더 조사가 필요하다]
     "아직 확실하지 않아. 더 파보자."
     -> deeper_investigation
 
