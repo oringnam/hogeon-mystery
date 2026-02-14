@@ -829,9 +829,39 @@ ${endingData.emoji} ${endingData.title}
 
 https://oringnam.github.io/hogeon-mystery/`;
 
-            navigator.clipboard.writeText(shareText).then(() => {
+            // Clipboard API fallback for mobile
+            const copyToClipboard = (text) => {
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+                }
+                
+                // Fallback: create textarea and copy
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                
+                try {
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999); // For mobile
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    return Promise.resolve(success);
+                } catch (err) {
+                    document.body.removeChild(textarea);
+                    return Promise.resolve(false);
+                }
+            };
+
+            copyToClipboard(shareText).then(success => {
                 const notification = document.getElementById('copyNotification');
-                notification.textContent = '✅ 공유 텍스트가 복사되었습니다!';
+                if (success) {
+                    notification.textContent = '✅ 공유 텍스트가 복사되었습니다!';
+                } else {
+                    notification.textContent = '❌ 복사 실패. 다시 시도해주세요.';
+                }
                 notification.classList.add('show');
                 setTimeout(() => {
                     notification.classList.remove('show');
