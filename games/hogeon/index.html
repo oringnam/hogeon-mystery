@@ -65,36 +65,49 @@
             background: #f8f9fa;
         }
 
-        .story-text {
-            margin-bottom: 15px;
-            padding: 12px 16px;
+        /* 일반 텍스트 블록 */
+        .story-block {
+            margin-bottom: 20px;
+            padding: 16px 20px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
             animation: fadeIn 0.3s;
         }
 
-        .story-text h1 {
-            font-size: 1.3em;
-            margin: 15px 0 10px 0;
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 8px;
+        .story-block p {
+            margin-bottom: 12px;
+            line-height: 1.8;
         }
 
-        .story-text p {
-            margin-bottom: 10px;
+        .story-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 헤더 (챕터 구분) */
+        .chapter-header {
+            margin: 30px 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            animation: fadeIn 0.3s;
+        }
+
+        .chapter-header h1 {
+            font-size: 1.4em;
+            color: #667eea;
+            font-weight: bold;
         }
 
         /* 선택한 대화 (파란색) */
         .choice-made {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             font-weight: 500;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+            animation: fadeIn 0.3s;
         }
 
         .choice-made::before {
@@ -261,26 +274,39 @@
             });
 
         function continueStory() {
-            // 스토리 텍스트 추가 (누적)
+            // 연속된 텍스트를 하나의 블록으로 묶기
+            let currentBlock = null;
+            
             while (story.canContinue) {
                 const line = story.Continue();
                 
                 if (line.trim() !== '') {
-                    const div = document.createElement('div');
-                    div.className = 'story-text';
-                    
-                    // 마크다운 스타일 헤더 변환 (# 헤더)
+                    // 헤더 (# 으로 시작)
                     if (line.trim().startsWith('# ')) {
+                        // 이전 블록 마감
+                        currentBlock = null;
+                        
+                        // 헤더 추가
+                        const headerDiv = document.createElement('div');
+                        headerDiv.className = 'chapter-header';
                         const h1 = document.createElement('h1');
                         h1.textContent = line.replace('# ', '').trim();
-                        div.appendChild(h1);
+                        headerDiv.appendChild(h1);
+                        storyContainer.appendChild(headerDiv);
                     } else {
+                        // 일반 텍스트 - 블록에 누적
+                        if (!currentBlock) {
+                            currentBlock = document.createElement('div');
+                            currentBlock.className = 'story-block';
+                            storyContainer.appendChild(currentBlock);
+                        }
+                        
+                        const p = document.createElement('p');
                         // 볼드 처리 (**text**)
                         let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        div.innerHTML = formattedLine;
+                        p.innerHTML = formattedLine;
+                        currentBlock.appendChild(p);
                     }
-                    
-                    storyContainer.appendChild(div);
                 }
             }
 
