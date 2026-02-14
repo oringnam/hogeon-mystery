@@ -571,11 +571,7 @@
                 <button class="header-btn" onclick="showClues()">📋 단서</button>
             </div>
             <h1 style="cursor: pointer;" onclick="window.location.href='../../'">🔍 호건이를 찾아서</h1>
-            <div class="progress-bar">
-                <div class="progress-indicator" id="progressIndicator">
-                    조사 시작 전
-                </div>
-            </div>
+            <!-- progress indicator removed -->
         </div>
 
         <div class="game-body">
@@ -1407,6 +1403,8 @@ https://oringnam.github.io/hogeon-mystery/`;
             ).length;
 
             const progressEl = document.getElementById('progressIndicator');
+            if (!progressEl) return; // UI에서 진행도 표시를 제거한 경우
+
             if (investigationDepth === 0) {
                 progressEl.textContent = '조사 시작 전';
             } else {
