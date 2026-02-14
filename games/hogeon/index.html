@@ -16,60 +16,90 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            flex-direction: column;
             color: #333;
         }
 
         .game-container {
-            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
             width: 100%;
+            margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
         }
 
         .game-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .game-header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 1.5em;
+            margin-bottom: 5px;
         }
 
         .game-header p {
             opacity: 0.9;
-            font-size: 0.95em;
+            font-size: 0.85em;
+        }
+
+        /* 대화창 + 선택지 영역 */
+        .game-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .story-container {
-            padding: 30px;
-            max-height: 60vh;
+            flex: 1;
+            padding: 20px;
             overflow-y: auto;
             line-height: 1.8;
+            background: #f8f9fa;
         }
 
         .story-text {
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s;
         }
 
         .story-text h1 {
-            font-size: 1.5em;
-            margin: 30px 0 15px 0;
+            font-size: 1.3em;
+            margin: 15px 0 10px 0;
             color: #667eea;
             border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .story-text p {
+            margin-bottom: 10px;
+        }
+
+        /* 선택한 대화 (파란색) */
+        .choice-made {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 15px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .choice-made::before {
+            content: '▸ ';
+            font-weight: bold;
         }
 
         @keyframes fadeIn {
@@ -77,22 +107,27 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* 선택지 영역 (고정) */
         .choices {
-            padding: 20px 30px 30px 30px;
-            background: #f8f9fa;
+            padding: 15px 20px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+            flex-shrink: 0;
+            max-height: 40vh;
+            overflow-y: auto;
         }
 
         .choice-button {
             display: block;
             width: 100%;
-            padding: 18px 24px;
-            margin-bottom: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
             background: white;
             border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1em;
+            border-radius: 10px;
+            font-size: 0.95em;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: left;
             font-family: inherit;
             color: #333;
@@ -101,8 +136,8 @@
         .choice-button:hover {
             border-color: #667eea;
             background: #f0f4ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
 
         .choice-button:active {
@@ -117,22 +152,22 @@
 
         .game-end {
             text-align: center;
-            padding: 40px 30px;
+            padding: 30px 20px;
         }
 
         .game-end h2 {
             color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-size: 1.5em;
         }
 
         .restart-button {
-            padding: 15px 40px;
+            padding: 12px 35px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 25px;
-            font-size: 1.1em;
+            border-radius: 20px;
+            font-size: 1em;
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
@@ -140,63 +175,38 @@
 
         .restart-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .loading {
             text-align: center;
-            padding: 60px 30px;
+            padding: 40px 20px;
             color: #666;
         }
 
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
-        /* 모바일 최적화 */
-        @media (max-width: 600px) {
-            .game-header h1 {
-                font-size: 1.6em;
-            }
-
-            .story-container {
-                padding: 20px;
-                font-size: 0.95em;
-            }
-
-            .choices {
-                padding: 15px 20px 20px 20px;
-            }
-
-            .choice-button {
-                padding: 15px 20px;
-                font-size: 0.95em;
-            }
-        }
-
         /* 스크롤바 스타일링 */
-        .story-container::-webkit-scrollbar {
+        .story-container::-webkit-scrollbar,
+        .choices::-webkit-scrollbar {
             width: 8px;
         }
 
-        .story-container::-webkit-scrollbar-track {
+        .story-container::-webkit-scrollbar-track,
+        .choices::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
 
-        .story-container::-webkit-scrollbar-thumb {
+        .story-container::-webkit-scrollbar-thumb,
+        .choices::-webkit-scrollbar-thumb {
             background: #667eea;
             border-radius: 4px;
         }
 
-        .story-container::-webkit-scrollbar-thumb:hover {
-            background: #5568d3;
+        /* 모바일 최적화 */
+        @media (max-width: 600px) {
+            .game-header h1 { font-size: 1.3em; }
+            .story-container { padding: 15px; }
+            .choices { padding: 12px 15px; }
+            .choice-button { padding: 12px 16px; font-size: 0.9em; }
         }
     </style>
 </head>
@@ -207,11 +217,13 @@
             <p>9년 만의 미스터리를 풀어보세요</p>
         </div>
 
-        <div class="story-container" id="story">
-            <div class="loading">스토리를 불러오는 중</div>
-        </div>
+        <div class="game-body">
+            <div class="story-container" id="story">
+                <div class="loading">스토리를 불러오는 중...</div>
+            </div>
 
-        <div class="choices" id="choices" style="display: none;"></div>
+            <div class="choices" id="choices" style="display: none;"></div>
+        </div>
     </div>
 
     <!-- inkjs 라이브러리 로드 (버전 2.3.0) -->
@@ -232,6 +244,7 @@
             })
             .then(storyData => {
                 story = new inkjs.Story(storyData);
+                storyContainer.innerHTML = ''; // 로딩 메시지 제거
                 continueStory();
             })
             .catch(error => {
@@ -248,30 +261,31 @@
             });
 
         function continueStory() {
-            storyContainer.innerHTML = '';
-
-            // 스토리 텍스트 출력
+            // 스토리 텍스트 추가 (누적)
             while (story.canContinue) {
                 const line = story.Continue();
                 
                 if (line.trim() !== '') {
-                    const p = document.createElement('div');
-                    p.className = 'story-text';
+                    const div = document.createElement('div');
+                    div.className = 'story-text';
                     
                     // 마크다운 스타일 헤더 변환 (# 헤더)
                     if (line.trim().startsWith('# ')) {
                         const h1 = document.createElement('h1');
                         h1.textContent = line.replace('# ', '').trim();
-                        p.appendChild(h1);
+                        div.appendChild(h1);
                     } else {
                         // 볼드 처리 (**text**)
                         let formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        p.innerHTML = formattedLine;
+                        div.innerHTML = formattedLine;
                     }
                     
-                    storyContainer.appendChild(p);
+                    storyContainer.appendChild(div);
                 }
             }
+
+            // 자동 스크롤 (tail로)
+            scrollToBottom();
 
             // 선택지 출력
             const choices = story.currentChoices;
@@ -284,7 +298,7 @@
                     const button = document.createElement('button');
                     button.className = 'choice-button';
                     button.textContent = choice.text;
-                    button.onclick = () => selectChoice(index);
+                    button.onclick = () => selectChoice(index, choice.text);
                     choicesContainer.appendChild(button);
                 });
             } else {
@@ -299,14 +313,29 @@
                     </div>
                 `;
             }
-
-            // 최신 텍스트로 스크롤
-            storyContainer.scrollTop = storyContainer.scrollHeight;
         }
 
-        function selectChoice(index) {
+        function selectChoice(index, choiceText) {
+            // 선택한 것을 파란색으로 표시
+            const choiceDiv = document.createElement('div');
+            choiceDiv.className = 'choice-made';
+            choiceDiv.textContent = choiceText;
+            storyContainer.appendChild(choiceDiv);
+
+            // 스토리 진행
             story.ChooseChoiceIndex(index);
-            continueStory();
+            
+            // 선택지 숨기기 (다음 텍스트 보여주기 전에)
+            choicesContainer.style.display = 'none';
+            
+            // 약간의 딜레이 후 다음 스토리
+            setTimeout(() => {
+                continueStory();
+            }, 100);
+        }
+
+        function scrollToBottom() {
+            storyContainer.scrollTop = storyContainer.scrollHeight;
         }
 
         // Service Worker 등록 (캐싱으로 빠른 재방문)
