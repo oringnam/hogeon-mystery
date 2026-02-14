@@ -326,7 +326,7 @@ VAR checked_records = false
 
 모두가 숨을 죽였다.
 
-* [법원 기록 발견]
+* [법원 기록 - 증인 출석]
     "2017년 3월, 서울중앙지법 기록에 이름이 있어."
     
     "재판?"
@@ -334,9 +334,21 @@ VAR checked_records = false
     "증인으로 출석했네. 사건 내용은... 폭력 사건 목격."
     
     ~ clue_witness = true
-    ~ clue_prison = false
     
     "증인? 그럼 범죄자가 아니라 목격자?"
+    
+    -> investigation_hub
+
+* [법원 기록 - 피고인]
+    "2017년 초, 법원 기록에 피고인으로..."
+    
+    "설마..."
+    
+    "교통사고 치사. 집행유예 후... 2019년 구속 기록이 있어."
+    
+    ~ clue_prison = true
+    
+    "지금 복역 중이란 얘기야?"
     
     -> investigation_hub
 
@@ -411,29 +423,32 @@ VAR checked_records = false
 
 각자가 추론한 가능성들:
 
-* {clue_lotto} ["돈 때문이었을까?"]
++ {clue_lotto} ["돈 때문이었을까?"]
     -> ending_lotto
 
-* {clue_ship} ["바다로 떠났을까?"]
++ {clue_ship} ["바다로 떠났을까?"]
     -> ending_ship
 
-* {clue_witness} ["누군가에게 쫓기고 있을까?"]
++ {clue_witness} ["누군가에게 쫓기고 있을까?"]
     -> ending_witness
 
-* {clue_hospital} ["사고를 당했을까?"]
++ {clue_hospital} ["사고를 당했을까?"]
     -> ending_coma
 
-* {clue_fantasy} ["정말로... 사라진 걸까?"]
++ {clue_fantasy} ["정말로... 사라진 걸까?"]
     -> ending_fantasy
 
-* {clue_spy} ["국가를 위해 일하고 있을까?"]
++ {clue_spy} ["국가를 위해 일하고 있을까?"]
     -> ending_spy
 
-* {clue_religion} ["마음의 평화를 찾았을까?"]
++ {clue_religion} ["마음의 평화를 찾았을까?"]
     -> ending_religion
 
-* {clue_business} ["빚 때문에 숨었을까?"]
++ {clue_business} ["빚 때문에 숨었을까?"]
     -> ending_business
+
++ {clue_prison} ["과거의 잘못 때문일까?"]
+    -> ending_prison
 
 + ["더 조사가 필요해"]
     "아직 확실하지 않아. 더 파보자."
@@ -514,6 +529,38 @@ VAR checked_records = false
     ~ investigation_depth++
     
     "출가라니... 무슨 일이 있었을까?"
+    
+    -> investigation_hub
+
++ [교정시설을 알아보자]
+    범환이 법무부 홈페이지를 뒤졌다.
+    
+    "...재소자 명단에 이름이 있어."
+    
+    모두가 침묵했다.
+    
+    "2024년 출소 예정이라고 나와 있네."
+    
+    ~ clue_prison = true
+    ~ investigation_depth++
+    
+    "감옥에...? 도대체 무슨 일이..."
+    
+    -> investigation_hub
+
++ [사업 실패 흔적을 찾아보자]
+    진원이 신용정보원 자료를 확인했다.
+    
+    "대출 연체 기록이... 엄청나네."
+    
+    "얼마나?"
+    
+    "1억 가까이. 사업 실패 후 신용불량."
+    
+    ~ clue_business = true
+    ~ investigation_depth++
+    
+    "빚 때문에 숨은 걸까?"
     
     -> investigation_hub
 
