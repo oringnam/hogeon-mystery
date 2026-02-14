@@ -497,35 +497,59 @@ VAR checked_records = false
 
 + {clue_ship} ["바다로 떠났을까?"]
     "부산 선박회사 기록을 봤어."
-    -> ending_ship
+    
+    "생활비도 거기서 보냈고."
+    
+    "원양어선이라면... 지금 바다에 있을 수도."
+    
+    범환이 검색했다. "다음 입항이 3주 후네."
+    
+    "기다려보자."
+    
+    -> approach_ship_ending
 
 + {clue_witness} ["누군가에게 쫓기고 있을까?"]
     "증인보호 얘기가 나왔잖아."
-    -> ending_witness
+    "경찰서에 다시 문의해보자."
+    -> approach_witness_ending
 
 + {clue_hospital} ["사고를 당했을까?"]
     "병원 기록에 장기 입원이..."
-    -> ending_coma
+    
+    "교통사고 기록도 있었고."
+    
+    "병원에 가봐야 할 것 같아."
+    
+    정호가 어머니께 허락을 받았다.
+    
+    "면회 가능하대."
+    
+    -> approach_coma_ending
 
 + {clue_fantasy} ["정말로... 사라진 걸까?"]
     "원룸에서 이상한 흔적을..."
-    -> ending_fantasy
+    "다시 가보자."
+    -> approach_fantasy_ending
 
 + {clue_spy} ["국가를 위해 일하고 있을까?"]
     "갑자기 체력 단련, 정보보안..."
-    -> ending_spy
+    "만약 국정원이라면... 연락이 올 때까지 기다려야 해."
+    -> approach_spy_ending
 
 + {clue_religion} ["마음의 평화를 찾았을까?"]
     "출가 기록이 있었어."
-    -> ending_religion
+    "강원도 산사로 가보자."
+    -> approach_religion_ending
 
 + {clue_business} ["빚 때문에 숨었을까?"]
     "사업 실패, 엄청난 빚..."
-    -> ending_business
+    "어디 숨어있을까... 찾아보자."
+    -> approach_business_ending
 
 + {clue_prison} ["과거의 잘못 때문일까?"]
     "법원 기록에 피고인으로..."
-    -> ending_prison
+    "교정시설에 가보자."
+    -> approach_prison_ending
 
 + {investigation_depth >= 2} ["더 조사가 필요해"]
     "아직 확실하지 않아. 더 파보자."
@@ -734,14 +758,40 @@ VAR checked_records = false
 
 -> epilogue
 
+=== approach_ship_ending ===
+
+3주 후.
+
+부산항.
+
+친구들은 입항 예정 시간 한참 전부터 와서 기다렸다.
+
+"정말 올까?"
+
+"회사에서 확인했다고 했잖아."
+
+바다를 바라봤다. 갈매기들이 날아다녔다.
+
+멀리서 배가 보였다.
+
+점점 가까워졌다.
+
+"저거다!"
+
+부두에 배가 정박했다.
+
+선원들이 하나둘 내리기 시작했다.
+
+그리고...
+
+-> ending_ship
+
 === ending_ship ===
 # ENDING: ship
 # IMAGE: ending_ship.png
 # 엔딩 2: 원양어선
 
-6개월 후.
-
-부산항에 배가 들어왔다.
+호건이 배에서 내렸다. 얼굴이 까맣게 탔다.
 
 친구들이 부두에서 기다리고 있었다.
 
@@ -773,14 +823,30 @@ VAR checked_records = false
 
 -> epilogue
 
+=== approach_coma_ending ===
+
+다음 날.
+
+서울대병원.
+
+친구들은 407호 앞에 섰다.
+
+긴장한 표정들.
+
+"들어가자."
+
+노크하고 문을 열었다.
+
+-> ending_coma
+
 === ending_coma ===
 # ENDING: coma
 # IMAGE: ending_hospital.png
 # 엔딩 3: 깨어나지 못한 친구
 
-서울대병원 407호.
+하얀 병실.
 
-호건이 누워 있었다.
+호건이 침대에 누워 있었다.
 
 2017년 2월 교통사고. 9년째 의식 불명.
 
@@ -1107,3 +1173,47 @@ IP 추적을 시도했지만 불가능했다.
 감사합니다.
 
 -> END
+
+// ========================================
+// Approach sections for remaining endings
+// ========================================
+
+=== approach_witness_ending ===
+며칠 후, 경찰서에서 연락이 왔다.
+"본인이 만나겠다고 합니다."
+안전가옥이었다.
+문이 열렸다.
+-> ending_witness
+
+=== approach_fantasy_ending ===
+호건의 원룸을 다시 찾았다.
+집주인이 문을 열어주었다.
+"아직 안 치웠어요."
+안으로 들어갔다.
+-> ending_fantasy
+
+=== approach_spy_ending ===
+1년 후.
+익명의 편지가 도착했다.
+"OO카페, 2시."
+가보니...
+-> ending_spy
+
+=== approach_religion_ending ===
+강원도 깊은 산 속.
+절을 찾았다.
+스님이 안내해주었다.
+-> ending_religion
+
+=== approach_business_ending ===
+제주도.
+작은 카페 앞에 섰다.
+간판: "재기"
+문을 열었다.
+-> ending_business
+
+=== approach_prison_ending ===
+교정시설 면회실.
+유리 너머로...
+-> ending_prison
+
