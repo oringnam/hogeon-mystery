@@ -289,7 +289,7 @@
 
         <footer>
             <div class="version" onclick="showChangelog()">
-                v3.29 · 2026-02-14
+                v3.30 · 2026-02-14
             </div>
         </footer>
     </div>
@@ -343,7 +343,7 @@
                     `;
                     
                     content.innerHTML = `
-                        <div style="position: sticky; top: 0; background: white; padding-bottom: 10px; border-bottom: 2px solid #667eea; margin-bottom: 15px;">
+                        <div style="position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding-bottom: 10px; border-bottom: 2px solid #667eea; margin-bottom: 15px;">
                             <h2 style="margin: 0; color: #667eea; font-size: 1.3em;">📝 변경 이력</h2>
                         </div>
                         <div style="line-height: 1.5; color: #333; font-size: 0.9em;">
@@ -351,7 +351,7 @@
                         </div>
                         <div style="margin-top: 15px; text-align: center;">
                             <button 
-                                onclick="this.closest('[style*=\\"position: fixed\\"]').remove()"
+                                class="changelog-close-btn"
                                 style="
                                     padding: 10px 25px;
                                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -363,8 +363,6 @@
                                     cursor: pointer;
                                     transition: all 0.2s;
                                 "
-                                onmouseover="this.style.transform='translateY(-2px)'"
-                                onmouseout="this.style.transform='translateY(0)'"
                             >
                                 닫기
                             </button>
@@ -389,6 +387,14 @@
                     
                     modal.appendChild(content);
                     document.body.appendChild(modal);
+                    
+                    // 닫기 버튼 이벤트 (DOM 추가 후)
+                    const closeBtn = content.querySelector('.changelog-close-btn');
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', () => {
+                            modal.remove();
+                        });
+                    }
                     
                     // 모달 외부 클릭 시 닫기
                     modal.addEventListener('click', (e) => {
