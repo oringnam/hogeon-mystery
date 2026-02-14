@@ -308,6 +308,13 @@
             story.ChooseChoiceIndex(index);
             continueStory();
         }
+
+        // Service Worker 등록 (캐싱으로 빠른 재방문)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('✅ 캐싱 활성화'))
+                .catch(err => console.log('Service Worker 등록 실패:', err));
+        }
     </script>
 </body>
 </html>
