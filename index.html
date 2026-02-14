@@ -289,7 +289,7 @@
 
         <footer>
             <div class="version" onclick="showChangelog()">
-                v3.30 · 2026-02-14
+                v3.31 · 2026-02-14
             </div>
         </footer>
     </div>
@@ -333,13 +333,13 @@
                     const content = document.createElement('div');
                     content.style.cssText = `
                         background: white;
-                        padding: 20px;
-                        border-radius: 16px;
-                        max-width: 700px;
+                        padding: 16px;
+                        border-radius: 12px;
+                        max-width: 550px;
                         width: 100%;
-                        max-height: 85vh;
+                        max-height: 75vh;
                         overflow-y: auto;
-                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
                     `;
                     
                     content.innerHTML = `
@@ -388,18 +388,44 @@
                     modal.appendChild(content);
                     document.body.appendChild(modal);
                     
+                    // 히스토리에 가상 상태 추가 (뒤로가기로 모달 닫기)
+                    history.pushState({ modalOpen: true }, '');
+                    
+                    // 모달 닫기 함수
+                    const closeModal = () => {
+                        modal.remove();
+                        // 히스토리 정리 (popstate 이벤트 제거)
+                        window.removeEventListener('popstate', handlePopState);
+                    };
+                    
+                    // 뒤로가기 이벤트 핸들러
+                    const handlePopState = (e) => {
+                        if (modal.parentNode) {
+                            closeModal();
+                        }
+                    };
+                    window.addEventListener('popstate', handlePopState);
+                    
                     // 닫기 버튼 이벤트 (DOM 추가 후)
                     const closeBtn = content.querySelector('.changelog-close-btn');
                     if (closeBtn) {
                         closeBtn.addEventListener('click', () => {
-                            modal.remove();
+                            closeModal();
+                            // 히스토리 되돌리기
+                            if (history.state && history.state.modalOpen) {
+                                history.back();
+                            }
                         });
                     }
                     
                     // 모달 외부 클릭 시 닫기
                     modal.addEventListener('click', (e) => {
                         if (e.target === modal) {
-                            modal.remove();
+                            closeModal();
+                            // 히스토리 되돌리기
+                            if (history.state && history.state.modalOpen) {
+                                history.back();
+                            }
                         }
                     });
                 })
