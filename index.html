@@ -13,133 +13,186 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 배경 패턴 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 50px;
-            animation: fadeInDown 1s;
-        }
-
-        header h1 {
-            font-size: 3em;
-            margin-bottom: 15px;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .game-card {
+        .main-card {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.1);
             text-align: center;
-            animation: fadeInUp 1s;
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .game-card h2 {
-            color: #667eea;
-            font-size: 2em;
+        .icon {
+            font-size: 4em;
             margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
         }
 
-        .game-card .description {
-            color: #666;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
             font-size: 1.1em;
-            line-height: 1.8;
-            margin-bottom: 30px;
+            color: #666;
+            margin-bottom: 35px;
+            line-height: 1.6;
         }
 
-        .game-card .features {
-            text-align: left;
-            margin: 30px 0;
+        .description {
+            font-size: 1em;
+            color: #888;
+            line-height: 1.8;
+            margin-bottom: 40px;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 12px;
-        }
-
-        .game-card .features h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .game-card .features ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .game-card .features li {
-            padding: 8px 0;
-            padding-left: 30px;
-            position: relative;
-            color: #555;
-        }
-
-        .game-card .features li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #667eea;
-            font-weight: bold;
-            font-size: 1.2em;
+            border-left: 4px solid #667eea;
         }
 
         .play-button {
             display: inline-block;
-            padding: 18px 50px;
+            padding: 20px 60px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-decoration: none;
-            border-radius: 30px;
-            font-size: 1.3em;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 10px 30px rgba(102, 126, 234, 0.4),
+                0 0 0 0 rgba(102, 126, 234, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .play-button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .play-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+            box-shadow: 
+                0 15px 40px rgba(102, 126, 234, 0.6),
+                0 0 0 8px rgba(102, 126, 234, 0.1);
         }
 
         .play-button:active {
             transform: translateY(-1px);
         }
 
-        footer {
-            text-align: center;
-            color: white;
-            margin-top: 40px;
-            opacity: 0.7;
-            font-size: 0.9em;
+        .play-button span {
+            position: relative;
+            z-index: 1;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .feature-tag {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #555;
+            font-weight: 600;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s;
+        }
+
+        .feature-tag:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            animation: fadeIn 1s 0.5s both;
+        }
+
+        .version {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .version:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
         }
 
         @keyframes fadeInUp {
@@ -153,36 +206,50 @@
             }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 600px) {
-            header h1 {
+            .main-card {
+                padding: 40px 25px;
+            }
+
+            .icon {
+                font-size: 3em;
+            }
+
+            .title {
                 font-size: 2em;
             }
 
-            .game-card {
-                padding: 30px 20px;
-            }
-
-            .game-card h2 {
-                font-size: 1.5em;
+            .subtitle {
+                font-size: 1em;
             }
 
             .play-button {
                 font-size: 1.1em;
-                padding: 15px 40px;
+                padding: 18px 50px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🔍 호건이를 찾아서</h1>
-            <p>9년 만의 미스터리 인터랙티브 스토리</p>
-        </header>
-
-        <div class="game-card">
-            <h2>Where is Hogeon?</h2>
+        <div class="main-card">
+            <div class="icon">🔍</div>
             
+            <h1 class="title">호건이를 찾아서</h1>
+            
+            <p class="subtitle">
+                9년 만의 미스터리를 풀어보세요
+            </p>
+
             <div class="description">
                 2017년부터 연락이 끊긴 친구 호건.<br>
                 9명의 친구들이 그를 찾아 나섭니다.<br>
@@ -190,48 +257,26 @@
             </div>
 
             <div class="features">
-                <h3>게임 특징</h3>
-                <ul>
-                    <li>선택에 따라 달라지는 다양한 엔딩</li>
-                    <li>단서 수집 기반 추리</li>
-                    <li>약 30분 플레이 타임</li>
-                    <li>모바일 최적화</li>
-                    <li>실화 기반 캐릭터</li>
-                </ul>
+                <div class="feature-tag">🎭 다양한 엔딩</div>
+                <div class="feature-tag">🔎 단서 수집</div>
+                <div class="feature-tag">⏱️ 30분 플레이</div>
+                <div class="feature-tag">📱 모바일 최적화</div>
+                <div class="feature-tag">🎵 BGM 3곡</div>
             </div>
 
             <a href="games/hogeon/" class="play-button">
-                ▶ 게임 시작하기
+                <span>▶ 게임 시작하기</span>
             </a>
         </div>
 
         <footer>
-            <p>Made with ❤️ using Ink & inkjs</p>
-            <p style="margin-top: 5px; font-size: 0.85em;">Music by Kevin MacLeod (incompetech.com) - CC BY 4.0</p>
-            <p style="margin-top: 5px;">© 2026 Interactive Story Project</p>
-            <p style="margin-top: 10px;">
-                <span 
-                    id="versionInfo" 
-                    style="
-                        color: #667eea; 
-                        cursor: pointer; 
-                        text-decoration: underline;
-                        font-size: 0.9em;
-                    "
-                    onclick="showChangelog()"
-                >
-                    v3.25 (2026-02-14)
-                </span>
-            </p>
+            <div class="version" onclick="showChangelog()">
+                v3.26 · 2026-02-14
+            </div>
         </footer>
     </div>
 
     <script>
-        // 페이지 로드 시 애니메이션
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🎮 호건이를 찾아서 - Ready to play!');
-        });
-
         // 변경 이력 모달 표시
         function showChangelog() {
             fetch('CHANGELOG.md')
@@ -264,18 +309,19 @@
                         z-index: 10000;
                         padding: 20px;
                         overflow-y: auto;
+                        animation: fadeIn 0.2s;
                     `;
                     
                     const content = document.createElement('div');
                     content.style.cssText = `
                         background: white;
                         padding: 30px;
-                        border-radius: 12px;
+                        border-radius: 16px;
                         max-width: 800px;
                         width: 100%;
                         max-height: 80vh;
                         overflow-y: auto;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
                     `;
                     
                     content.innerHTML = `
@@ -290,17 +336,17 @@
                                 onclick="this.closest('[style*=\\"position: fixed\\"]').remove()"
                                 style="
                                     padding: 12px 30px;
-                                    background: #667eea;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                                     color: white;
                                     border: none;
-                                    border-radius: 8px;
+                                    border-radius: 25px;
                                     font-size: 16px;
                                     font-weight: 600;
                                     cursor: pointer;
                                     transition: all 0.2s;
                                 "
-                                onmouseover="this.style.background='#764ba2'"
-                                onmouseout="this.style.background='#667eea'"
+                                onmouseover="this.style.transform='translateY(-2px)'"
+                                onmouseout="this.style.transform='translateY(0)'"
                             >
                                 닫기
                             </button>
