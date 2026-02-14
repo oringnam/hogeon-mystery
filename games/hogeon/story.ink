@@ -36,6 +36,7 @@ VAR checked_records = false
 // ========================================
 
 === prologue ===
+# IMAGE: prologue.png
 # 프롤로그: 9년 만의 연락
 
 2026년 2월, 서울 강남의 한 카페.
@@ -505,6 +506,7 @@ VAR checked_records = false
 // ========================================
 
 === ending_lotto ===
+# IMAGE: ending_lotto.png
 # 엔딩 1: 로또 당첨
 
 친구들은 서울 동대문구의 한 고급 아파트를 찾았다.
@@ -558,6 +560,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_ship ===
+# IMAGE: ending_ship.png
 # 엔딩 2: 원양어선
 
 6개월 후.
@@ -595,6 +598,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_coma ===
+# IMAGE: ending_hospital.png
 # 엔딩 3: 깨어나지 못한 친구
 
 서울대병원 407호.
@@ -630,6 +634,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_witness ===
+# IMAGE: ending_witness.png
 # 엔딩 4: 증인보호
 
 3주 후, 진원의 휴대폰에 문자가 왔다.
@@ -669,6 +674,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_fantasy ===
+# IMAGE: ending_isekai.png
 # 엔딩 5: 이세계 전이 (?)
 
 친구들은 호건의 원룸을 방문했다.
@@ -712,6 +718,7 @@ VAR checked_records = false
 -> epilogue
 
 === ending_spy ===
+# IMAGE: ending_spy.png
 # 엔딩 6: 국정원 요원
 
 1년 후.
@@ -749,6 +756,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_religion ===
+# IMAGE: ending_religion.png
 # 엔딩 7: 출가
 
 강원도 깊은 산 속 절.
@@ -794,6 +802,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_business ===
+# IMAGE: ending_business.png
 # 엔딩 8: 사업 실패와 재기
 
 제주도.
@@ -837,6 +846,7 @@ IP 추적을 시도했지만 불가능했다.
 -> epilogue
 
 === ending_prison ===
+# IMAGE: ending_prison.png
 # 엔딩 9: 출소
 
 서울구치소.

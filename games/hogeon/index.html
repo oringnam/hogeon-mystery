@@ -163,6 +163,33 @@
             font-weight: bold;
         }
 
+        /* 스토리 이미지 */
+        .story-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: fadeIn 0.5s;
+        }
+
+        .story-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .story-image.placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: white;
+        }
+
         /* 엔딩 모달 */
         .ending-modal {
             display: none;
@@ -423,6 +450,18 @@
             while (story.canContinue) {
                 const line = story.Continue();
                 
+                // 태그 체크 (이미지)
+                const tags = story.currentTags;
+                if (tags && tags.length > 0) {
+                    tags.forEach(tag => {
+                        if (tag.startsWith('IMAGE:')) {
+                            const filename = tag.replace('IMAGE:', '').trim();
+                            renderImage(filename);
+                            currentBlock = null; // 이미지 후 새 블록 시작
+                        }
+                    });
+                }
+                
                 if (line.trim() !== '') {
                     // 헤더 (# 으로 시작)
                     if (line.trim().startsWith('# ')) {
@@ -482,6 +521,47 @@
                 choicesContainer.style.display = 'none';
                 showEndingModal();
             }
+        }
+
+        function renderImage(filename) {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'story-image';
+            
+            const imagePath = `images/${filename}`;
+            
+            // 이미지 로드 시도
+            const img = new Image();
+            img.onload = function() {
+                // 이미지 로드 성공
+                const imgElement = document.createElement('img');
+                imgElement.src = imagePath;
+                imgElement.alt = 'Story Image';
+                imageContainer.appendChild(imgElement);
+            };
+            img.onerror = function() {
+                // 이미지 없으면 placeholder (이모지)
+                const placeholderEmoji = getPlaceholderEmoji(filename);
+                imageContainer.classList.add('placeholder');
+                imageContainer.textContent = placeholderEmoji;
+            };
+            img.src = imagePath;
+            
+            storyContainer.appendChild(imageContainer);
+        }
+
+        function getPlaceholderEmoji(filename) {
+            // 파일명 기반 이모지 placeholder
+            if (filename.includes('prologue')) return '☕';
+            if (filename.includes('lotto')) return '🎰';
+            if (filename.includes('ship')) return '🚢';
+            if (filename.includes('hospital')) return '🏥';
+            if (filename.includes('witness')) return '🛡️';
+            if (filename.includes('isekai')) return '✨';
+            if (filename.includes('spy')) return '👁️';
+            if (filename.includes('religion')) return '🙏';
+            if (filename.includes('business')) return '💼';
+            if (filename.includes('prison')) return '⚖️';
+            return '🖼️';
         }
 
         function detectEnding(headerText) {
