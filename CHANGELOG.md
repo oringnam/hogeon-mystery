@@ -1,5 +1,21 @@
 # 변경 이력 (Changelog)
 
+## v4.4 (2026-02-14) - 🧹 **모바일 캐시/이미지 표시 안정화**
+
+### 수정
+- Service Worker 업데이트 안정화
+  - `skipWaiting()` + `clients.claim()` 추가
+  - 이전 캐시 자동 삭제(activate 단계)
+  - HTML / story.json은 **network-first**로 가져오도록 개선
+  - 불안정 네트워크에서 특정 파일 실패로 SW install이 깨지지 않게 `Promise.allSettled` 적용
+- story.json 캐시 우회 버전 파라미터 갱신
+  - `story.json?v=3.25` → `story.json?v=4.4`
+- 이미지 로딩 UX 개선
+  - 로딩 중에도 이미지 영역(1:1) 공간 확보
+  - 실패 시 placeholder 표시 로직 단순화
+
+---
+
 ## v4.3 (2026-02-14) - 🐛 **버그 수정 및 전체 검수**
 
 ### 수정 (Critical Bug Fix)
