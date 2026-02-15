@@ -1,5 +1,17 @@
 # 변경 이력 (Changelog)
 
+## v4.14 (2026-02-15) - 🖼️ **사용자 다운로드 원본 일러스트로 전체 교체**
+
+### 변경
+- 프롤로그 + 엔딩 9종 이미지를 사용자 다운로드 원본으로 교체(캡쳐 UI/여백 없이 깔끔한 버전)
+  - `prologue.png`
+  - `ending_lotto.png`, `ending_ship.png`, `ending_hospital.png`, `ending_witness.png`, `ending_isekai.png`, `ending_spy.png`, `ending_religion.png`, `ending_business.png`, `ending_overseas.png`
+
+### 기술
+- Service Worker 캐시 버전 bump (v55)
+
+---
+
 ## v4.12 (2026-02-15) - 🖼️ **프롤로그 일러스트 클린 버전 교체 + 참조 이미지 추적 해제**
 
 ### 변경
